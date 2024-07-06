@@ -56,6 +56,8 @@ def create_dirs(path_to_directory):
         os.makedirs(p / 'plots')
     if 'labels' not in os.listdir(p):
         os.makedirs(p / 'labels')
+    if 'csv' not in os.listdir(p):
+        os.makedirs(p / 'csv')
 
 
 class ListUploadedFiles(generics.ListAPIView):
@@ -105,7 +107,10 @@ class ZipViewSet(generics.ListAPIView):
 
             list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
             answer = process_images(list_files, by_images=True)
-            print(answer)
+            answer.to_csv('media/csv/answer.csv')
+
+            with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
+                cur_zipfile.write('media/csv/answer.csv', 'answer.csv')
 
             for id in answer['id'].unique():
                 ans_id = answer[answer['id'] == id]
@@ -148,6 +153,9 @@ class FilesViewSet(generics.ListAPIView):
         for file in data:
             FileSystemStorage(location='media/images/').save(file.name, file)
 
+            with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
+                cur_zipfile.write('media/images/' + file.name, 'images/' + os.path.basename(file.name))
+
         list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
 
         answer = process_images(list_files, by_images=True)
@@ -160,8 +168,11 @@ class FilesViewSet(generics.ListAPIView):
         with open('media/jsons/data.txt', 'w') as outfile:
             json.dump(json_ans, outfile)
 
+        answer.to_csv('media/csv/answer.csv')
+
         with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
             cur_zipfile.write('media/jsons/data.txt', 'data.txt')
+            cur_zipfile.write('media/csv/answer.csv', 'answer.csv')
 
         with open('media/archives/file.zip', 'rb') as cur_zipfile:
             response = HttpResponse(cur_zipfile, content_type='application/zip')
