@@ -74,7 +74,7 @@ class RegState extends State<RegWidget> {
           Navigator.push( 
             context,
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: empty, dataEmptyFlag: true, prevpage: RegWidget(prevpage: prevpage), userData:userData,  newLabelData: emptyList),
+              pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: null, dataEmptyFlag: true, prevpage: RegWidget(prevpage: prevpage), userData:userData,  newLabelData: emptyList),
               transitionsBuilder: (_, animation, __, child) {
                 return FadeTransition(
                   opacity: animation,

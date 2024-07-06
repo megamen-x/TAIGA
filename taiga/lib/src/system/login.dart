@@ -66,7 +66,7 @@ class LoginState extends State<LoginWidget> {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: empty, dataEmptyFlag: true, prevpage: LoginWidget(prevpage: WelcomeWidget()), userData:userData, newLabelData: emptyList),
+            pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: null, dataEmptyFlag: true, prevpage: LoginWidget(prevpage: WelcomeWidget()), userData:userData, newLabelData: emptyList),
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(
                 opacity: animation,

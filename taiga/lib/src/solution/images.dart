@@ -67,7 +67,14 @@ class ImagesState extends State<ImagesWidget> {
   @override
   void initState() {
     showingTooltip = -1;
-    dataList = filesarr;
+    if (!(filesarr?.isEmpty ?? true)){
+      dataList = filesarr;
+    }
+    else {
+      List<DataModel> empty = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
+      dataList = empty;
+    }
+    
     // DataModel.updateDataModel(dataList, newLabelData);
     jsonDataList = dataList.map((dataModel) => dataModel.toJson()).toList();
     super.initState();
@@ -853,8 +860,6 @@ class ImagesState extends State<ImagesWidget> {
                                                       onPressed: () {
                                                         setState(() {
                                                           // uploadNewData(context);
-                                                          print(!filesarr.isEmpty);
-                                                          print(tmptimeList);
                                                         });
                                                       },
                                                       shape: RoundedRectangleBorder(
@@ -1151,7 +1156,7 @@ class ImagesState extends State<ImagesWidget> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             // ЗАМЕНИТЬ
-                                            if (!filesarr.isEmpty || zipplot)
+                                            if (!(filesarr?.isEmpty ?? true) || zipplot)
                                             Column(
                                               children: [
                                                 Container(
