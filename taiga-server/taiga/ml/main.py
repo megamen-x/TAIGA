@@ -3,15 +3,30 @@ import torch
 from tqdm import tqdm
 from ml.configs.config import MainConfig
 from ml.utils.utils import load_detector, load_classificator, open_mapping, extract_crops
-from confz import FileSource 
+from confz import FileSource
 from PIL import Image, ExifTags
 from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
-from typing  import Union, Dict
+from typing  import Union, List
+
+# Настройка конфига
+main_config = MainConfig(config_sources=FileSource(file="ml/configs/config.yml"))
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+mapping = open_mapping(path_mapping=main_config.mapping)
+detector_config = main_config.detector
+classificator_config = main_config.classificator
+detector = load_detector(detector_config).to(device)
+classificator = load_classificator(classificator_config).to(device)
 
 
-class AnimalRegistration:
+class RegistrationImage:
+    def __init__(self, filepath: str, data_registration: datetime, count: int) -> None:
+        self.filepath = filepath
+        self.data_registration = data_registration
+        self.count = count
+
+class Registration:
     """
     Реализация класса регистрации
     Поля:
@@ -30,7 +45,7 @@ class AnimalRegistration:
     ) -> None:
         self.data_start_registration = data_start_registration
         self.max_count = count_animals
-        self.images = dict()
+        self.images = list()
         self.update(data_start_registration, file_path, count_animals)
         self.species = class_animal
 
@@ -56,12 +71,13 @@ class AnimalRegistration:
             count_animals: int
     ) -> None:
         self.data_end_registration = data_end_registration
-        self.images[file_path] = count_animals
+        image = RegistrationImage(filepath=file_path, data_registration=data_end_registration, count=count_animals)
+        self.images.append(image)
         if count_animals > self.max_count:
             self.max_count = count_animals
         self.set_duration()
 
-    def get_images(self) -> Dict[str, int]:
+    def get_images(self) -> List[RegistrationImage]:
         return self.images
 
     def get_duration(self) -> timedelta:
@@ -97,18 +113,9 @@ def sorted_files_by_time(files: list) -> tuple:
     list_dates = [item[1] for item in sorted_combined]
     return listfiles, list_dates
 
-# Настройка конфига
-main_config = MainConfig(config_sources=FileSource(file="ml/configs/config.yml"))
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-mapping = open_mapping(path_mapping=main_config.mapping)
-detector_config = main_config.detector
-classificator_config = main_config.classificator
-detector = load_detector(detector_config).to(device)
-classificator = load_classificator(classificator_config).to(device)
-
 
 # Обработка изображений
-def process_images(list_files) -> Union[pd.DataFrame, None]:
+def process_images(list_files, by_images: bool=False, save_results_path: str='answer.csv') -> Union[pd.DataFrame, None]:
     list_files, list_dates = sorted_files_by_time(list_files)
     if len(list_files):
         regs = {
@@ -120,17 +127,17 @@ def process_images(list_files) -> Union[pd.DataFrame, None]:
                 'Empty': [],
                 'Fox': [],
                 'Goral': [],
-                'Hare': [], 
-                'Lynx': [], 
-                'Marten': [], 
-                'Moose': [], 
-                'Mountain_Goat': [], 
-                'Musk_Deer': [], 
-                'Racoon_Dog': [], 
-                'Red_Deer': [], 
-                'Roe_Deer': [], 
-                'Snow_Leopard': [], 
-                'Squirrel': [], 
+                'Hare': [],
+                'Lynx': [],
+                'Marten': [],
+                'Moose': [],
+                'Mountain_Goat': [],
+                'Musk_Deer': [],
+                'Racoon_Dog': [],
+                'Red_Deer': [],
+                'Roe_Deer': [],
+                'Snow_Leopard': [],
+                'Squirrel': [],
                 'Tiger': [],
                 'Wolf': [],
                 'Wolverine': []
@@ -176,42 +183,45 @@ def process_images(list_files) -> Union[pd.DataFrame, None]:
                                 if el == 'empty':
                                     continue
                                 if len(regs[el]) == 0:
-                                    regs[el].append(AnimalRegistration(data_start_registration=list_dates[i],
+                                    regs[el].append(Registration(data_start_registration=list_dates[i],
                                                                     count_animals=class_names.count(el), class_animal=el,
                                                                     file_path=list_files[i]))
                                 else:
                                     if list_dates[i] - regs[el][-1].get_data_end() > timedelta(minutes=30):
-                                        regs[el].append(AnimalRegistration(data_start_registration=list_dates[i],
+                                        regs[el].append(Registration(data_start_registration=list_dates[i],
                                                                         count_animals=class_names.count(el),
                                                                         class_animal=el, file_path=list_files[i]))
                                     else:
                                         regs[el][-1].update(list_dates[i], list_files[i], class_names.count(el))
-        final_dict = {
-            'name_folder': [],
-            'class': [],
-            'date_registration_start': [],
-            'flag': [], 'count': [], 'max_count': [], 'link': []
-        }
-        df = pd.DataFrame(final_dict)
+        keys = ['name_folder', 'class', 'date_registration_start', 'date_registration_end', 'max_count', 'flag']
+        if by_images:
+            new_keys = ['count', 'link', 'date_registration', 'id']
+            keys.extend(new_keys)
+        df = pd.DataFrame(columns=keys)
         for key, val in regs.items():
-            for el in val:
-                for img_path, count_img in el.get_images().items():
-                    new_row = {'name_folder': 1, 'class': el.get_animal_species(),
-                            'date_registration_start': el.get_data_start().strftime('%Y-%m-%d %H:%M:%S'),
-                            'flag': el.get_duration(),
-                            'count': count_img,
-                            'max_count': el.get_max_count(),
-                            'link': img_path}
+            for i, el in enumerate(val):
+                new_row = {
+                    'name_folder': 1, 'class': el.get_animal_species(),
+                    'date_registration_start': el.get_data_start().strftime('%Y-%m-%d %H:%M:%S'),
+                    'date_registration_end': el.get_data_end().strftime('%Y-%m-%d %H:%M:%S'),
+                    'flag': el.get_duration(), 'max_count': el.get_max_count()}
+                if by_images:
+                    for image in el.get_images():
+                        new_row['date_registration'] = image.data_registration.strftime('%Y-%m-%d %H:%M:%S')
+                        new_row['count'] = image.count,
+                        new_row['link'] = image.filepath
+                        new_row['id'] = str(i + 1)
+                        df.loc[len(df)] = new_row
+                else:
                     df.loc[len(df)] = new_row
-        df = df.sort_values(by=['date_registration_start'])
-        df.to_csv('answer.csv', index=False)
+        df = df.sort_values(by=['date_registration' if by_images else 'date_registration_start'])
+        df.to_csv(save_results_path, index=False)
         return df
     else:
         return None
 
 
 if __name__ == '__main__':
-    list_files = os.listdir('train_data_Minprirodi\\traps\\1\\images')
-    list_files = [os.path.join('train_data_Minprirodi\\traps\\1\\images', el) for el in list_files]
-    answer = process_images(list_files)
-    print(answer)
+    list_files = os.listdir('train_data_Minprirodi\\traps\\2\\images')
+    list_files = [os.path.join('train_data_Minprirodi\\traps\\2\\images', el) for el in list_files]
+    answer = process_images(list_files, by_images=True)

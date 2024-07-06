@@ -104,12 +104,16 @@ class ZipViewSet(generics.ListAPIView):
                         cur_zipfile.write('media/images/' + name, 'images/' + os.path.basename(name))
 
             list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
-            answer = process_images(list_files)
-            res = {'name': [os.path.basename(el) for el in answer['link']],
-                   'class': list(answer['class']),
-                   'date_registration': [f'{i} - {j}' for i, j in enumerate(list(answer['flag']))],
-                   'count': list(answer['count'])}
-            json_ans['data'].append(res)
+            answer = process_images(list_files, by_images=True)
+            print(answer)
+
+            for id in answer['id'].unique():
+                ans_id = answer[answer['id'] == id]
+                res = {'name': [os.path.basename(name) for name in ans_id['link']],
+                       'class': list(ans_id['class']),
+                       'date_registration': [f'{i} - {j}' for i, j in enumerate(list(ans_id['flag']))],
+                       'count': list(a[0] for a in ans_id['count'])}
+                json_ans['data'].append(res)
 
             with open('media/jsons/data.txt', 'w') as outfile:
                  json.dump(json_ans, outfile)
@@ -146,7 +150,7 @@ class FilesViewSet(generics.ListAPIView):
 
         list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
 
-        answer = process_images(list_files)
+        answer = process_images(list_files, by_images=True)
         res = {'name': [os.path.basename(el) for el in answer['link']],
                'class': list(answer['class']),
                'date_registration': [f'{i} - {j}' for i, j in enumerate(list(answer['flag']))],
