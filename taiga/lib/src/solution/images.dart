@@ -57,13 +57,13 @@ class ImagesState extends State<ImagesWidget> {
   final List<XFile> _list = [];
   List<String> newfileargs = [];
   List<Map<String, dynamic>> jsonDataList = [];
-  List<DataModel> dataList = [DataModel(column1: ' ', column2: ' ', column3: [' ',])];
+  List<DataModel> dataList = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
   
   @override
   void initState() {
     showingTooltip = -1;
     dataList = filesarr;
-    DataModel.updateDataModel(dataList, newLabelData);
+    // DataModel.updateDataModel(dataList, newLabelData);
     jsonDataList = dataList.map((dataModel) => dataModel.toJson()).toList();
     super.initState();
     // print(jsonDataList);
@@ -130,9 +130,11 @@ class ImagesState extends State<ImagesWidget> {
           String dataString = dataFile.readAsStringSync();
           final responceMap = jsonDecode(dataString);
           final dataMap = jsonDecode(jsonEncode(responceMap["data"]));
+          print(dataMap);
           setState(() {
             dataClearFlag = true;
             dataEmptyFlag = false;
+            loadingFlag = false;
             loadingFlag2 = false;
             dataList = [];
             zipplot = false;
@@ -144,7 +146,7 @@ class ImagesState extends State<ImagesWidget> {
               dataList.add(newData);
             }
             zipplot = true;
-            plotName = './responce/zip/deers_fig.jpeg';
+            // plotName = './responce/zip/deers_fig.jpeg';
           });
 
         }
@@ -286,9 +288,10 @@ class ImagesState extends State<ImagesWidget> {
   Future<void> clearData() async {
     if (Platform.isWindows || Platform.isLinux) {
       images = [];
-      dataList = [DataModel(column1: ' ', column2: ' ', column3: [' ',])];
+      dataList = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
       deleteFilesInFolder("./responce/images");
       deleteFilesInFolder("./responce/zip");
+      deleteFilesInFolder("./responce/zip/images");
     }
     setState(() {
       _list.clear();
@@ -569,7 +572,7 @@ class ImagesState extends State<ImagesWidget> {
                       child: 
                       SingleChildScrollView(
                         child: Container(
-                          padding: EdgeInsets.fromLTRB(60*fframe, 10*fframe, 0*fframe, 10*fframe),
+                          padding: EdgeInsets.fromLTRB(60*fframe, 10*fframe, 60*fframe, 10*fframe),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -922,7 +925,7 @@ class ImagesState extends State<ImagesWidget> {
                                               sortAscending: true,
                                               columns: [
                                                 DataColumn(label: 
-                                                  Text('НОМЕР РЕГИСТРАЦИИ',
+                                                  Text('ФАЙЛЫ',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       color: Color(0xFFFFFFFF),
@@ -980,7 +983,24 @@ class ImagesState extends State<ImagesWidget> {
                                                     DataCell(
                                                       Padding(
                                                         padding: EdgeInsets.symmetric(vertical: 10*fframe, horizontal: 5*fframe),
-                                                        child: Text(shortcall(data.column1, 16),
+                                                        child: Text(data.column1.join("\n\n"),
+                                                        // shortcall(data.column1.join("\n\n"), 16)
+                                                          textAlign: TextAlign.center,
+                                                          style: TextStyle(
+                                                            color: Color(0xFFFFFFFF),
+                                                            fontFamily: 'Inter',
+                                                            fontSize: 18*fframe,
+                                                            fontWeight: FontWeight.w600,
+                                                            letterSpacing: 2*fframe/frame,
+                                                            height: 1.3*fframe,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ),
+                                                    DataCell(
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(vertical: 10*fframe, horizontal: 5*fframe),
+                                                        child: Text(data.column2.join("\n\n"),
                                                           textAlign: TextAlign.center,
                                                           style: TextStyle(
                                                             color: Color(0xFFFFFFFF),
@@ -1012,23 +1032,7 @@ class ImagesState extends State<ImagesWidget> {
                                                     DataCell(
                                                       Padding(
                                                         padding: EdgeInsets.symmetric(vertical: 10*fframe, horizontal: 5*fframe),
-                                                        child: Text(data.column2,
-                                                          textAlign: TextAlign.center,
-                                                          style: TextStyle(
-                                                            color: Color(0xFFFFFFFF),
-                                                            fontFamily: 'Inter',
-                                                            fontSize: 18*fframe,
-                                                            fontWeight: FontWeight.w600,
-                                                            letterSpacing: 2*fframe/frame,
-                                                            height: 1.3*fframe,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ),
-                                                    DataCell(
-                                                      Padding(
-                                                        padding: EdgeInsets.symmetric(vertical: 10*fframe, horizontal: 5*fframe),
-                                                        child: Text(data.column2,
+                                                        child: Text(data.column4.join("\n\n"),
                                                           textAlign: TextAlign.center,
                                                           style: TextStyle(
                                                             color: Color(0xFFFFFFFF),
@@ -1045,9 +1049,10 @@ class ImagesState extends State<ImagesWidget> {
                                                   onSelectChanged: (bool? selected) {
                                                     if (selected != null && selected) {
                                                       setState(() {
-                                                        newfileargs.add(data.column1);
-                                                        newfileargs.add(data.column2);
+                                                        newfileargs.add(data.column1.join("\n\n"));
+                                                        newfileargs.add(data.column2.join("\n\n"));
                                                         newfileargs.add(data.column3.join("\n\n"));
+                                                        newfileargs.add(data.column4.join("\n\n"));
                                                       });
                                                       if (dataEmptyFlag == false) {
                                                         Navigator.push(
@@ -1104,7 +1109,7 @@ class ImagesState extends State<ImagesWidget> {
                                         child: Row(
                                           children: [
                                             // ЗАМЕНИТЬ
-                                            if (!zipplot)
+                                            if (zipplot)
                                             Column(
                                               children: [
                                                 Container(
@@ -1217,6 +1222,7 @@ class ImagesState extends State<ImagesWidget> {
                                             SizedBox(
                                               width: 120*fframe,
                                             ),
+                                            if (zipplot)
                                             Row(
                                               children: [
                                                 Column(
@@ -1534,41 +1540,44 @@ class ImagesState extends State<ImagesWidget> {
 
 
 class DataModel {
-  String column1;
-  String column2;
+  List<dynamic> column1;
+  List<dynamic> column2;
   List<dynamic> column3;
+  List<dynamic> column4;
 
-  DataModel({required this.column1, required this.column2, required this.column3});
+  DataModel({required this.column1, required this.column2, required this.column3, required this.column4});
 
   factory DataModel.fromJson(Map<String, dynamic> json) {
     return DataModel(
-      column1: json['column1'],
-      column2: json['column2'],
-      column3: json['column3'],
+      column1: json['name'],
+      column2: json['class'],
+      column3: json['date_registration'],
+      column4: json['count'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'column1': column1,
-      'column2': column2,
-      'column3': column3,
+      'name': column1,
+      'class': column2,
+      'date_registration': column3,
+      'count': column4,
     };
   }
 
-  static void updateDataModel(List<DataModel> dataList, List<String> newData) {
-    final String matchString = newData[0];
-    final String newColumn2 = newData[1];
-    final List<String> newColumn3 = [newData[2]];
+  // static void updateDataModel(List<DataModel> dataList, List<String> newData) {
+  //   final String matchString = newData[0];
+  //   final String newColumn2 = newData[1];
+  //   final List<String> newColumn3 = [newData[2]];
 
-    for (DataModel dataModel in dataList) {
-      if (dataModel.column1 == matchString) {
-        dataModel.column2 = newColumn2;
-        dataModel.column3 = newColumn3;
-        break;
-      }
-    }
-  }
+  //   for (DataModel dataModel in dataList) {
+  //     if (dataModel.column1 == matchString) {
+  //       dataModel.column2 = newColumn2;
+  //       dataModel.column3 = newColumn3;
+  //       break;
+  //     }
+  //   }
+  // }
 }
 
 

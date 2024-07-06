@@ -61,7 +61,7 @@ class LoginState extends State<LoginWidget> {
         );
         final Map parsedData = jsonDecode(responseData.body);
         data.update('email', (value) => parsedData['email']);
-        List<DataModel> empty = [DataModel(column1: ' ', column2: ' ', column3: [' ',])];
+        List<DataModel> empty = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
         List<String> emptyList = ['', '', ''];
         Navigator.push(
           context,

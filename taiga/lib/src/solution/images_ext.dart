@@ -58,7 +58,7 @@ class ExtImagesState extends State<ExtImagesWidget> {
     substring = fileargs[0];
     // print(images);
     // print(fileargs);
-    newindex = images.indexOf(images.where((element) => element.contains(substring) as bool).toList()[0]);
+    // newindex = images.indexOf(images.where((element) => element.contains(substring) as bool).toList()[0]);
   }
 
   @override
@@ -434,10 +434,10 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                         children: [
                                           //  text-input
                                           Container(
-                                            width: 640*fframe,
-                                            height: 640*fframe,
+                                            width: 700*fframe,
+                                            height: 700*fframe,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFF437590),
+                                              color: Color(0xFF20333E),
                                               borderRadius: BorderRadius.circular(15.0*fframe),
                                             ),
                                             padding: EdgeInsets.symmetric(horizontal: 15*fframe, vertical: 15*fframe),
@@ -448,31 +448,31 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                               children: [
                                                 
                                                 Container(
-                                                  width: 600*fframe,
-                                                  height: 600*fframe,
+                                                  width: 660*fframe,
+                                                  height: 660*fframe,
                                                   decoration: BoxDecoration(
-                                                    color: Color(0xFF224138),
+                                                    color: Color(0xFF2A4350),
                                                     borderRadius: BorderRadius.circular(12.0*fframe),
                                                   ),
-                                                  child: 
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    child: PageView.builder(
-                                                      controller: _imageController,
-                                                      scrollDirection: Axis.horizontal,
-                                                      // itemCount: 1,
-                                                      itemBuilder: (context, index) {
-                                                        return ClipRRect(
-                                                          child:
-                                                            Image.file(File(images[newindex]),
-                                                              height: 420*frame,
-                                                              width: MediaQuery.of(context).size.width * 1,
-                                                              fit: BoxFit.contain,
-                                                            ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
+                                                  // child: 
+                                                  // Padding(
+                                                  //   padding: const EdgeInsets.all(8.0),
+                                                  //   child: PageView.builder(
+                                                  //     controller: _imageController,
+                                                  //     scrollDirection: Axis.horizontal,
+                                                  //     // itemCount: 1,
+                                                  //     itemBuilder: (context, index) {
+                                                  //       return ClipRRect(
+                                                  //         child:
+                                                  //           Image.file(File(images[newindex]),
+                                                  //             height: 420*frame,
+                                                  //             width: MediaQuery.of(context).size.width * 1,
+                                                  //             fit: BoxFit.contain,
+                                                  //           ),
+                                                  //       );
+                                                  //     },
+                                                  //   ),
+                                                  // ),
                                                 ),
                                               ],
                                             ),
@@ -482,9 +482,9 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                           ),
                                           Container(
                                             width: 6*fframe,
-                                            height: 600*fframe,
+                                            height: 700*fframe,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFF0BC776),
+                                              color: Color(0xFF1A95D7),
                                               borderRadius: BorderRadius.circular(15.0*fframe),
                                             ),
                                           ),
@@ -493,25 +493,25 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                           ),
                                           // instructions
                                           Container(
-                                            width: 580*fframe,
-                                            height: 640*fframe,
+                                            width: 600*fframe,
+                                            height: 700*fframe,
                                             decoration: BoxDecoration(
-                                              color: Color(0xFF437590),
+                                              color: Color(0xFF20333E),
                                               borderRadius: BorderRadius.circular(15.0*fframe),
                                             ),
-                                            padding: EdgeInsets.symmetric(horizontal: 30*fframe, vertical: 40*fframe),
+                                            padding: EdgeInsets.symmetric(horizontal: 30*fframe, vertical: 20*fframe),
                                             child: 
                                             // file info
                                             Column(
                                               children: [
-                                                Text('ДАННЫЕ О ФАЙЛЕ',
+                                                Text('ДАННЫЕ О РЕГИСТРАЦИИ',
                                                   textAlign: TextAlign.start, 
                                                   style: TextStyle(
                                                     color: Color(0xFFFFFFFF),
                                                     fontFamily: 'Oswald',
-                                                    fontSize: 48*fframe,
+                                                    fontSize: 30*fframe,
                                                     fontWeight: FontWeight.w500,
-                                                    letterSpacing: 3*fframe/frame,
+                                                    letterSpacing: 5*fframe/frame,
                                                     height: 1.3*fframe/frame,
                                                   )
                                                 ),
@@ -526,61 +526,75 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                                       decoration: BoxDecoration(
                                                         color: Color(0xFFF9F8F6),
                                                         borderRadius: BorderRadius.circular(15.0*fframe),
-                                                        // border: Border.all(color: Color(0xFF0BC776), width: 3*fframe)
                                                       ),
                                                       padding: EdgeInsets.symmetric(horizontal: 15*fframe, vertical: 30*fframe),
                                                       child: Column(
                                                         mainAxisAlignment: MainAxisAlignment.start,
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          Text('Название: ${shortcall(fileargs[0], 20)}',
+                                                          Text('Названия: \n${fileargs[0].split('\n\n').join(', ')}',
+                                                          //${shortcall(fileargs[0].split('\n\n'), 20)}
                                                             textAlign: TextAlign.start, 
                                                             style: TextStyle(
                                                               color: Color(0xFF000000), 
                                                               fontFamily: 'Inter',
-                                                              fontSize: 24*fframe,
+                                                              fontSize: 18*fframe,
                                                               fontWeight: FontWeight.w500,
                                                               letterSpacing: 1*fframe/frame,
-                                                              height: 1.3*fframe/frame,
+                                                              height: 1.7*fframe/frame,
                                                             )
                                                           ),
                                                           SizedBox(
                                                             width: double.infinity,
                                                             height: 10*fframe,
                                                           ),
-                                                          Text('Количество: ${fileargs[1]}',
+                                                          Text('Класс: \n${fileargs[1].split('\n\n').join(', ')}',
                                                             textAlign: TextAlign.start, 
                                                             style: TextStyle(
                                                               color: Color(0xFF000000),
                                                               fontFamily: 'Inter',
-                                                              fontSize: 24*fframe,
+                                                              fontSize: 18*fframe,
                                                               fontWeight: FontWeight.w500,
                                                               letterSpacing: 1*fframe/frame,
-                                                              height: 1.3*fframe/frame,
+                                                              height: 1.7*fframe/frame,
                                                             )
                                                           ),
                                                           SizedBox(
                                                             width: double.infinity,
                                                             height: 10*fframe,
                                                           ),
-                                                          Text('Виды: ${fileargs[2]}',
+                                                          Text('Время: \n${fileargs[2].split('\n\n').join(', ')}',
                                                             textAlign: TextAlign.start, 
                                                             style: TextStyle(
                                                               color: Color(0xFF000000),
                                                               fontFamily: 'Inter',
-                                                              fontSize: 24*fframe,
+                                                              fontSize: 18*fframe,
                                                               fontWeight: FontWeight.w500,
                                                               letterSpacing: 1*fframe/frame,
-                                                              height: 1.3*fframe/frame,
+                                                              height: 1.7*fframe/frame,
+                                                            )
+                                                          ),
+                                                          SizedBox(
+                                                            width: double.infinity,
+                                                            height: 10*fframe,
+                                                          ),
+                                                          Text('Количество: \n${fileargs[3].split('\n\n').join(', ')}',
+                                                            textAlign: TextAlign.start, 
+                                                            style: TextStyle(
+                                                              color: Color(0xFF000000),
+                                                              fontFamily: 'Inter',
+                                                              fontSize: 18*fframe,
+                                                              fontWeight: FontWeight.w500,
+                                                              letterSpacing: 1*fframe/frame,
+                                                              height: 1.7*fframe/frame,
                                                             )
                                                           ),
                                                         ],
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                      height: 70*fframe,
+                                                      height: 30*fframe,
                                                     ),
-                                                    
                                                     SizedBox(
                                                       width: double.infinity,
                                                       child: Column(
@@ -610,18 +624,18 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                                             children: [
                                                               Container(
                                                                 height: 55*fframe,
-                                                                padding: EdgeInsets.symmetric(horizontal: 5*fframe, vertical: 0*fframe),
+                                                                padding: EdgeInsets.symmetric(horizontal: 0*fframe, vertical: 0*fframe),
                                                                 decoration: BoxDecoration(
                                                                   // color: Color(0xFFF9F8F6),
                                                                   borderRadius: BorderRadius.circular(15.0*fframe),
-                                                                  border: Border.all(color: Color(0xFF0BC776), width: 3*fframe)
+                                                                  border: Border.all(color: Color(0xFF1A95D7), width: 3*fframe)
                                                                 ),
                                                                 child: MaterialButton(
                                                                   onPressed: () {
                                                                     NewDataLabel(context, fileargs);
                                                                   },
                                                                   shape: RoundedRectangleBorder(
-                                                                    borderRadius: BorderRadius.circular(15.0*fframe),
+                                                                    borderRadius: BorderRadius.circular(12.0*fframe),
                                                                   ),
                                                                   height: 55*fframe,
                                                                   child: Text('Ошибка классификатора', 

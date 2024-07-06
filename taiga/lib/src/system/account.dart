@@ -161,7 +161,7 @@ class AccState extends State<AccWidget> {
                                 ),
                                 child: OutlinedButton(
                                   onPressed: () {
-                                    List<DataModel> empty = [DataModel(column1: ' ', column2: ' ', column3: [' ',])];
+                                    List<DataModel> empty = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
                                     List<String> emptyList = ['', '', ''];
                                     Navigator.push(
                                       context,
@@ -323,7 +323,7 @@ class AccState extends State<AccWidget> {
                                 ),
                                 child: OutlinedButton(
                                   onPressed: () {
-                                    List<DataModel> empty = [DataModel(column1: ' ', column2: ' ', column3: [' ',])];
+                                    List<DataModel> empty = [DataModel(column1: [' ',], column2: [' ',], column3: [' ',], column4: [' ',])];
                                     List<String> emptyList = ['', '', ''];
                                     Navigator.push(
                                       context,
