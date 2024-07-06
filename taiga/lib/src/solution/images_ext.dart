@@ -23,25 +23,24 @@ List <String> files = [];
 String filepath = '';
 
 class ExtImagesWidget extends StatefulWidget {
-  final dataList, fileargs, images, dataEmptyFlag, prevpage, userData;
+  final dataList, fileargs, images, timeList, dataEmptyFlag, prevpage, userData;
 
-  ExtImagesWidget({super.key, @required this.dataList, this.fileargs, this.images, this.dataEmptyFlag, this.prevpage, this.userData});
+  ExtImagesWidget({super.key, @required this.dataList, this.fileargs, this.images, this.timeList, this.dataEmptyFlag, this.prevpage, this.userData});
 
   @override
-  State<ExtImagesWidget> createState() => ExtImagesState(dataList: dataList, fileargs: fileargs, images: images, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData: userData);
+  State<ExtImagesWidget> createState() => ExtImagesState(dataList: dataList, fileargs: fileargs, imagesList: images, timeList: timeList, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData: userData);
 }
 
 class ExtImagesState extends State<ExtImagesWidget> {
 
-  var dataList, fileargs, images, dataEmptyFlag, prevpage, userData;
-  ExtImagesState({ @required this.dataList, this.fileargs, this.images, this.dataEmptyFlag, this.prevpage, this.userData});
+  var dataList, fileargs, imagesList, timeList, dataEmptyFlag, prevpage, userData;
+  ExtImagesState({ @required this.dataList, this.fileargs, this.imagesList, this.timeList, this.dataEmptyFlag, this.prevpage, this.userData});
 
   bool loadingFlag = false;
   bool dataClearFlag = false;
   bool buttonflag = false;
 
   var shortcall = ShortenFileName();
-  final _imageController = PageController();
 
   List<String> myList = [
     'responce/deer_7.jpg',
@@ -50,16 +49,22 @@ class ExtImagesState extends State<ExtImagesWidget> {
     'responce/deer_18.jpg'
   ];
 
+  
+
   String substring = 'deer.jpg';
   List<dynamic> matchingElements = [];
   int newindex = 0;
+  List<dynamic> filteredList = [];
 
   void item() {
-    substring = fileargs[0];
-    // print(images);
-    // print(fileargs);
-    // newindex = images.indexOf(images.where((element) => element.contains(substring) as bool).toList()[0]);
+    List<String> tmp = fileargs[0].split(', ');
+    filteredList = imagesList.where((element) {
+      String fileName = element.split('/').last;
+      return tmp.contains(fileName);
+    }).toList();
   }
+  List<String> filesList = [];
+
 
   @override
   void initState() {
@@ -229,10 +234,11 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                 ),
                                 child: OutlinedButton(
                                   onPressed: () {
+                                    print(timeList);
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
-                                        pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: dataList, images: images, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData),
+                                        pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: dataList, images: imagesList, tmptimeList: timeList, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData),
                                         transitionsBuilder: (_, animation, __, child) {
                                           return FadeTransition(
                                             opacity: animation,
@@ -389,10 +395,11 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                 ),
                                 child: OutlinedButton(
                                   onPressed: () {
+                                    print(timeList);
                                     Navigator.push(
                                       context,
                                       PageRouteBuilder(
-                                        pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: dataList, images: images, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData, newLabelData: fileargs),
+                                        pageBuilder: (_, __, ___) =>  ImagesWidget(filesarr: dataList, images: imagesList, tmptimeList: timeList, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData, newLabelData: fileargs),
                                         transitionsBuilder: (_, animation, __, child) {
                                           return FadeTransition(
                                             opacity: animation,
@@ -456,21 +463,61 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                                   child: 
                                                   Padding(
                                                     padding: const EdgeInsets.all(8.0),
-                                                    child: PageView.builder(
-                                                      controller: _imageController,
-                                                      scrollDirection: Axis.horizontal,
-                                                      itemCount: 2,
+                                                    // fileargs[0].split(', ').length
+                                                    child: ListView.builder(
+                                                      itemCount: fileargs[0].split(', ').length,
                                                       itemBuilder: (context, index) {
-                                                        return ClipRRect(
-                                                          child:
-                                                            Image.file(File(images[index]),
-                                                              height: 420*frame,
-                                                              width: MediaQuery.of(context).size.width * 1,
-                                                              fit: BoxFit.contain,
-                                                            ),
-                                                        );
-                                                      },
+                                                        return 
+                                                          Column(
+                                                            children: [
+                                                              Padding(
+                                                                padding: const EdgeInsets.all(8.0),
+                                                                child: ClipRRect(
+                                                                  borderRadius: BorderRadius.circular(15.0),
+                                                                  child: Image.file(
+                                                                    File(filteredList[index]),
+                                                                    fit: BoxFit.contain,
+                                                                    height: 420*frame,
+                                                                    width: MediaQuery.of(context).size.width * 1,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                height: 10*fframe,
+                                                              ),
+                                                              Text(filteredList[index],
+                                                                textAlign: TextAlign.start, 
+                                                                style: TextStyle(
+                                                                  color: Color(0xFFFFFFFF),
+                                                                  fontFamily: 'Inter',
+                                                                  fontSize: 20*fframe,
+                                                                  fontWeight: FontWeight.w500,
+                                                                  letterSpacing: 3*fframe/frame,
+                                                                  height: 1.3*fframe/frame,
+                                                                )
+                                                              ),
+                                                              SizedBox(
+                                                                height: 40*fframe,
+                                                              ),
+                                                            ],
+                                                          );
+                                                      }
                                                     ),
+                                                    // child: PageView.builder(
+                                                    //   controller: _imageController,
+                                                    //   scrollDirection: Axis.horizontal,
+                                                    //   itemCount: 2,
+                                                    //   itemBuilder: (context, index) {
+                                                    //     return ClipRRect(
+                                                    //       child:
+                                                    //         Image.file(File(images[index]),
+                                                    //           height: 420*frame,
+                                                    //           width: MediaQuery.of(context).size.width * 1,
+                                                    //           fit: BoxFit.contain,
+                                                    //         ),
+                                                    //     );
+                                                    //   },
+                                                    // ),
                                                   ),
                                                 ),
                                               ],

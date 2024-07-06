@@ -27,17 +27,17 @@ List <String> files = [];
 
 
 class ImagesWidget extends StatefulWidget {
-  final filesarr, images, dataEmptyFlag, prevpage, userData, newLabelData;
-  ImagesWidget({super.key, @required this.filesarr, this.images, this.dataEmptyFlag, this.prevpage, this.userData, this.newLabelData});
+  final filesarr, images, tmptimeList, dataEmptyFlag, prevpage, userData, newLabelData;
+  ImagesWidget({super.key, @required this.filesarr, this.images, this.tmptimeList, this.dataEmptyFlag, this.prevpage, this.userData, this.newLabelData});
 
   @override
-  State<ImagesWidget> createState() => ImagesState(filesarr: filesarr, images: images, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData: userData, newLabelData: newLabelData);
+  State<ImagesWidget> createState() => ImagesState(filesarr: filesarr, images: images, tmptimeList: tmptimeList, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData: userData, newLabelData: newLabelData);
 }
 
 class ImagesState extends State<ImagesWidget> {
 
-  var filesarr, images, dataEmptyFlag, prevpage, userData, newLabelData;
-  ImagesState({ @required this.filesarr, this.images, this.dataEmptyFlag, this.prevpage, this.userData, this.newLabelData});
+  var filesarr, images, tmptimeList, dataEmptyFlag, prevpage, userData, newLabelData;
+  ImagesState({ @required this.filesarr, this.images, this.tmptimeList, this.dataEmptyFlag, this.prevpage, this.userData, this.newLabelData});
 
   bool loadingFlag = false;
   bool loadingFlag2 = false;
@@ -71,7 +71,11 @@ class ImagesState extends State<ImagesWidget> {
     // DataModel.updateDataModel(dataList, newLabelData);
     jsonDataList = dataList.map((dataModel) => dataModel.toJson()).toList();
     super.initState();
-    // print(jsonDataList);
+    if (tmptimeList != null) {
+      // timeList = tmptimeList;
+      print(tmptimeList);
+      timeList = tmptimeList;
+    }
   }
 
   String plotName = '';
@@ -90,7 +94,6 @@ class ImagesState extends State<ImagesWidget> {
         pathFiles.add(_list[i].path);
       }
     }
-    print(pathFiles);
     for (var i = 0; i < pathFiles.length; i++) {
       if (path.extension(pathFiles[i]) == '.zip') {
         uploadZip(context, pathFiles);
@@ -99,7 +102,6 @@ class ImagesState extends State<ImagesWidget> {
         uploadImage(context, pathFiles);
       }
       else {
-        debugPrint('blya(');
       }
     }
   }
@@ -147,7 +149,6 @@ class ImagesState extends State<ImagesWidget> {
         request.headers.addAll(userDataString);
         var streamedResponse  = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
-        print(response.statusCode);
         if (response.statusCode == 200) {
           unzipFileFromResponse(response.bodyBytes, 'zip/');
           String path = '';
@@ -157,7 +158,6 @@ class ImagesState extends State<ImagesWidget> {
           final responceMap = jsonDecode(dataString);
           dataMap = jsonDecode(jsonEncode(responceMap["data"]));
           // final data list
-          print(dataMap);
           var tmpList = [];
           dataFinalList = dataMap.map((map) {return map.values.toList();}).toList();
           for (var i = 0; i < dataFinalList.length; i++) {
@@ -221,7 +221,6 @@ class ImagesState extends State<ImagesWidget> {
       loadingFlag = true;
     });
 
-    print(pathFiles);
     if (pathFiles != null) {
       try {    
         var  postUri = Uri.parse('http://127.0.0.1:8000/files/');
@@ -244,6 +243,15 @@ class ImagesState extends State<ImagesWidget> {
           String dataString = dataFile.readAsStringSync();
           final responceMap = jsonDecode(dataString);
           final dataMap = jsonDecode(jsonEncode(responceMap["data"]));
+          // final data list
+          var tmpList = [];
+          dataFinalList = dataMap.map((map) {return map.values.toList();}).toList();
+          for (var i = 0; i < dataFinalList.length; i++) {
+            tmpList.add(dataFinalList = dataMap.map((map) {return map.values.toList();}).toList()[i][2]);
+          }
+          timeList = convertList(tmpList);
+          List<int> convertedList = convertToSeconds(timeList);
+          maxValue = convertedList.reduce((curr, next) => curr > next? curr: next);
           setState(() {
             dataClearFlag = true;
             dataEmptyFlag = false;
@@ -285,40 +293,39 @@ class ImagesState extends State<ImagesWidget> {
       });
     }
   }
-
-  Future<void> uploadNewData(context) async {
-    final json = jsonDataList;
-    try {
-      final response = await http.post(
-          Uri.parse('http://127.0.0.1:8000/active_learning/'),
-          headers: {
-            HttpHeaders.contentTypeHeader: 'application/json',
-            "Authorization": "Token ${userData['auth_token']}"
-          },
-          body: jsonEncode(json),
-      );
-      // print(response.statusCode);
-      if (response.statusCode == 200) {
-        Sample.AlshowDialog(context, 'Обучение модели запущено', 'Обучение может занять продолжительное время');
-      }
-      Sample.AlshowDialog(context, 'Обучение модели запущено', 'Обучение может занять продолжительное время');
-    } on SocketException {
-        setState(() {
-          Sample.AlshowDialog(context, 'Нет соединения с сервером!', 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
-        });
-      } on HttpException {
-        setState(() {
-          Sample.AlshowDialog(context, "Не удалось найти метод post!", 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
-        });
-      } on FormatException {
-        setState(() {
-          Sample.AlshowDialog(context, "Неправильный формат ответа!", 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
-        });
-      }
-  }
+  // Масштабируемость реализации active learning
+  // Future<void> uploadNewData(context) async {
+  //   final json = jsonDataList;
+  //   try {
+  //     final response = await http.post(
+  //         Uri.parse('http://127.0.0.1:8000/active_learning/'),
+  //         headers: {
+  //           HttpHeaders.contentTypeHeader: 'application/json',
+  //           "Authorization": "Token ${userData['auth_token']}"
+  //         },
+  //         body: jsonEncode(json),
+  //     );
+  //     if (response.statusCode == 200) {
+  //       Sample.AlshowDialog(context, 'Обучение модели запущено', 'Обучение может занять продолжительное время');
+  //     }
+  //     Sample.AlshowDialog(context, 'Обучение модели запущено', 'Обучение может занять продолжительное время');
+  //   } on SocketException {
+  //       setState(() {
+  //         Sample.AlshowDialog(context, 'Нет соединения с сервером!', 'Проверьте состояние сервера и попробуйте снова');
+  //         loadingFlag2 = false;
+  //       });
+  //     } on HttpException {
+  //       setState(() {
+  //         Sample.AlshowDialog(context, "Не удалось найти метод post!", 'Проверьте состояние сервера и попробуйте снова');
+  //         loadingFlag2 = false;
+  //       });
+  //     } on FormatException {
+  //       setState(() {
+  //         Sample.AlshowDialog(context, "Неправильный формат ответа!", 'Проверьте состояние сервера и попробуйте снова');
+  //         loadingFlag2 = false;
+  //       });
+  //     }
+  // }
 
   Future<void> _fileProvider() async {
     if (!await launchUrl(fileprovider)) {
@@ -336,6 +343,7 @@ class ImagesState extends State<ImagesWidget> {
     }
     setState(() {
       _list.clear();
+      filesarr.clear();
       dataEmptyFlag = false;
       zipplot = false;
       loadingFlag2 = false;
@@ -469,18 +477,6 @@ class ImagesState extends State<ImagesWidget> {
                                 ),
                                 child: OutlinedButton(
                                   onPressed: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   PageRouteBuilder(
-                                    //     pageBuilder: (_, __, ___) =>  VideosWidget(filesarr: filesarr, dataEmptyFlag: dataEmptyFlag, prevpage: ImagesWidget(filesarr: filesarr, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData), userData:userData),
-                                    //     transitionsBuilder: (_, animation, __, child) {
-                                    //       return FadeTransition(
-                                    //         opacity: animation,
-                                    //         child: child,
-                                    //       );
-                                    //     }
-                                    //   )
-                                    // );
                                   },
                                   style: OutlinedButton.styleFrom(
                                     padding: EdgeInsets.fromLTRB(0*frame, 0*frame, 0*frame, 0*frame),
@@ -651,13 +647,13 @@ class ImagesState extends State<ImagesWidget> {
                                               setState(() {
                                                 _list.addAll(detail.files);
                                               });
-                                              debugPrint('onDragDone:');
-                                              for (final file in detail.files) {
-                                                debugPrint('  ${file.path} ${file.name}'
-                                                    '  ${await file.lastModified()}'
-                                                    '  ${await file.length()}'
-                                                    '  ${file.mimeType}');
-                                              }
+                                              // debugPrint('onDragDone:');
+                                              // for (final file in detail.files) {
+                                              //   debugPrint('  ${file.path} ${file.name}'
+                                              //       '  ${await file.lastModified()}'
+                                              //       '  ${await file.length()}'
+                                              //       '  ${file.mimeType}');
+                                              // }
                                             },
                                             onDragEntered: (detail) => setState(() => isDragged = true),
                                             onDragExited: (detail) => setState(() => isDragged = false),
@@ -856,7 +852,9 @@ class ImagesState extends State<ImagesWidget> {
                                                     child: MaterialButton(
                                                       onPressed: () {
                                                         setState(() {
-                                                          uploadNewData(context);
+                                                          // uploadNewData(context);
+                                                          print(!filesarr.isEmpty);
+                                                          print(tmptimeList);
                                                         });
                                                       },
                                                       shape: RoundedRectangleBorder(
@@ -1095,15 +1093,12 @@ class ImagesState extends State<ImagesWidget> {
                                                         newfileargs.add(data.column2.join(", "));
                                                         newfileargs.add(data.column3.join(", "));
                                                         newfileargs.add(data.column4.join(", "));
-                                                        print(newfileargs);
-                                                        print('-- -- -- -- - -- -- -- - -');
-                                                        print(dataMap);
                                                       });
                                                       if (dataEmptyFlag == false) {
                                                         Navigator.push(
                                                           context,
                                                           PageRouteBuilder(
-                                                            pageBuilder: (_, __, ___) =>  ExtImagesWidget(dataList: dataList, fileargs: newfileargs, images: images, dataEmptyFlag: dataEmptyFlag, prevpage: ImagesWidget(filesarr: filesarr, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData), userData:userData),
+                                                            pageBuilder: (_, __, ___) =>  ExtImagesWidget(dataList: dataList, fileargs: newfileargs, images: images, timeList: timeList, dataEmptyFlag: dataEmptyFlag, prevpage: ImagesWidget(filesarr: filesarr, dataEmptyFlag: dataEmptyFlag, prevpage: prevpage, userData:userData), userData:userData),
                                                             transitionsBuilder: (_, animation, __, child) {
                                                               return FadeTransition(
                                                                 opacity: animation,
@@ -1156,7 +1151,7 @@ class ImagesState extends State<ImagesWidget> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             // ЗАМЕНИТЬ
-                                            if (zipplot)
+                                            if (!filesarr.isEmpty || zipplot)
                                             Column(
                                               children: [
                                                 Container(
