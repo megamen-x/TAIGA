@@ -1,52 +1,155 @@
-from pathlib import Path
-from configs.config import MainConfig
-from confz import BaseConfig, FileSource
 import os
 import torch
-import numpy as np
 from tqdm import tqdm
-from utils.utils import load_detector, load_classificator, open_mapping, extract_crops
+from ml.configs.config import MainConfig
+from ml.utils.utils import load_detector, load_classificator, open_mapping, extract_crops
+from confz import FileSource 
+from PIL import Image, ExifTags
+from datetime import datetime, timedelta
+import numpy as np
 import pandas as pd
-from itertools import repeat
+from typing  import Union, Dict
 
 
-def main():
-    # Load main config
-    main_config = MainConfig(config_sources=FileSource(file=os.path.join("configs", "config.yml")))
-    device = main_config.device
+class AnimalRegistration:
+    """
+    Реализация класса регистрации
+    Поля:
+    1. data_start_registration - дата начала регистрации
+    2. images - хранилище фоток определенной регистрации
+    2. max_count - максимальное количество обьектов одного класса внутри одной регистрации
+    3. species - класс животного конкретной регистрации
+    """
 
-    # Load imgs from source dir
-    pathes_to_imgs = [i for i in Path(main_config.src_dir).glob("*")
-                      if i.suffix.lower() in [".jpeg", ".jpg", ".png"]]
+    def __init__(
+            self,
+            data_start_registration: datetime,
+            count_animals: int,
+            class_animal: str,
+            file_path: str
+    ) -> None:
+        self.data_start_registration = data_start_registration
+        self.max_count = count_animals
+        self.images = dict()
+        self.update(data_start_registration, file_path, count_animals)
+        self.species = class_animal
 
-    # Load mapping for classification task
-    mapping = open_mapping(path_mapping=main_config.mapping)
+    def get_max_count(self) -> int:
+        return self.max_count
 
-    # Separate main config
-    detector_config = main_config.detector
-    classificator_config = main_config.classificator
+    def set_max_count(self, count: int) -> None:
+        self.max_count = count
 
-    # Load models
-    detector = load_detector(detector_config).to(device)
-    classificator = load_classificator(classificator_config).to(device)
+    def get_animal_species(self) -> str:
+        return self.species
 
-    # Inference
-    if len(pathes_to_imgs):
+    def get_data_start(self) -> datetime:
+        return self.data_start_registration
 
-        list_predictions = []
+    def get_data_end(self) -> datetime:
+        return self.data_end_registration
 
-        num_packages_det = np.ceil(len(pathes_to_imgs) / detector_config.batch_size).astype(np.int32)
+    def update(
+            self,
+            data_end_registration: datetime,
+            file_path: str,
+            count_animals: int
+    ) -> None:
+        self.data_end_registration = data_end_registration
+        self.images[file_path] = count_animals
+        if count_animals > self.max_count:
+            self.max_count = count_animals
+        self.set_duration()
+
+    def get_images(self) -> Dict[str, int]:
+        return self.images
+
+    def get_duration(self) -> timedelta:
+        return self.duration
+
+    def set_duration(self) -> None:
+        self.duration = self.data_end_registration - self.data_start_registration
+
+
+def sorted_files_by_time(files: list) -> tuple:
+    list_dates = []
+    for file in files:
+        img = Image.open(file)
+        img_exif = img.getexif()
+        if img_exif is None:
+            print('Sorry, image has no exif data.')
+            return []
+        else:
+            flag = False
+            for key, val in img_exif.items():
+                if key in ExifTags.TAGS and ExifTags.TAGS[key] == 'DateTime':
+                    flag = True
+                    datetime_object = datetime.strptime(val, '%Y:%m:%d %H:%M:%S')
+                    list_dates.append(datetime_object)
+                    break
+            if not flag:
+                print('Sorry, image has no datetime metadata')
+                return []
+    combined = list(zip(files, list_dates))
+    # Sort the combined list based on the datetime
+    sorted_combined = sorted(combined, key=lambda x: x[1])
+    listfiles = [item[0] for item in sorted_combined]
+    list_dates = [item[1] for item in sorted_combined]
+    return listfiles, list_dates
+
+# Настройка конфига
+main_config = MainConfig(config_sources=FileSource(file="ml/configs/config.yml"))
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+mapping = open_mapping(path_mapping=main_config.mapping)
+detector_config = main_config.detector
+classificator_config = main_config.classificator
+detector = load_detector(detector_config).to(device)
+classificator = load_classificator(classificator_config).to(device)
+
+
+# Обработка изображений
+def process_images(list_files) -> Union[pd.DataFrame, None]:
+    list_files, list_dates = sorted_files_by_time(list_files)
+    if len(list_files):
+        regs = {
+                'Badger': [],
+                'Bear': [],
+                'Bison': [],
+                'Cat': [],
+                'Dog': [],
+                'Empty': [],
+                'Fox': [],
+                'Goral': [],
+                'Hare': [], 
+                'Lynx': [], 
+                'Marten': [], 
+                'Moose': [], 
+                'Mountain_Goat': [], 
+                'Musk_Deer': [], 
+                'Racoon_Dog': [], 
+                'Red_Deer': [], 
+                'Roe_Deer': [], 
+                'Snow_Leopard': [], 
+                'Squirrel': [], 
+                'Tiger': [],
+                'Wolf': [],
+                'Wolverine': []
+            }
+
+        num_packages_det = np.ceil(len(list_files) / detector_config.batch_size).astype(np.int32)
         with torch.no_grad():
-            for i in tqdm(range(num_packages_det), colour="green"):
+            for i in tqdm(range(num_packages_det), colour="red"):
                 # Inference detector
-                batch_images_det = pathes_to_imgs[detector_config.batch_size * i:
-                                                  detector_config.batch_size * (1 + i)]
-                results_det = detector(batch_images_det,
-                                       iou=detector_config.iou,
-                                       conf=detector_config.conf,
-                                       imgsz=detector_config.imgsz,
-                                       verbose=False,
-                                       device=device)
+                batch_images_det = list_files[detector_config.batch_size * i:
+                                            detector_config.batch_size * (1 + i)]
+                results_det = detector(
+                    batch_images_det,
+                    iou=detector_config.iou,
+                    conf=detector_config.conf,
+                    imgsz=detector_config.imgsz,
+                    verbose=False,
+                    device=device
+                )
 
                 if len(results_det) > 0:
                     # Extract crop by bboxes
@@ -54,7 +157,6 @@ def main():
 
                     # Inference classificator
                     for img_name, batch_images_cls in dict_crops.items():
-                        # if len(batch_images_cls) > classificator_config.batch_size:
                         num_packages_cls = np.ceil(len(batch_images_cls) / classificator_config.batch_size).astype(
                             np.int32)
                         for j in range(num_packages_cls):
@@ -69,41 +171,47 @@ def main():
                             top_class_idx = top_class_idx.cpu().numpy().ravel()
 
                             class_names = [mapping[top_class_idx[idx]] for idx, _ in enumerate(batch_images_cls)]
-
-                            list_predictions.extend([[name, cls, prob] for name, cls, prob in
-                                                     zip(repeat(img_name, len(class_names)), class_names, top_p)])
-
-        # Create Dataframe with predictions
-        table = pd.DataFrame(list_predictions, columns=["image_name", "class_name", "confidence"])
-        # table.to_csv("table.csv", index=False) # Раскомментируйте, если хотите увидеть результаты предсказания
-        # нейронной сети по каждому найденному объекту
-
-        agg_functions = {
-            'class_name': ['count'],
-            "confidence": ["mean"]
+                            unique_species = list(set(class_names))
+                            for el in unique_species:
+                                if el == 'empty':
+                                    continue
+                                if len(regs[el]) == 0:
+                                    regs[el].append(AnimalRegistration(data_start_registration=list_dates[i],
+                                                                    count_animals=class_names.count(el), class_animal=el,
+                                                                    file_path=list_files[i]))
+                                else:
+                                    if list_dates[i] - regs[el][-1].get_data_end() > timedelta(minutes=30):
+                                        regs[el].append(AnimalRegistration(data_start_registration=list_dates[i],
+                                                                        count_animals=class_names.count(el),
+                                                                        class_animal=el, file_path=list_files[i]))
+                                    else:
+                                        regs[el][-1].update(list_dates[i], list_files[i], class_names.count(el))
+        final_dict = {
+            'name_folder': [],
+            'class': [],
+            'date_registration_start': [],
+            'flag': [], 'count': [], 'max_count': [], 'link': []
         }
-        groupped = table.groupby(['image_name', "class_name"]).agg(agg_functions)
-        img_names = groupped.index.get_level_values("image_name").unique()
-
-        final_res = []
-
-        for img_name in img_names:
-            groupped_per_img = groupped.query(f"image_name == '{img_name}'")
-            max_num_objects = groupped_per_img["class_name", "count"].max()
-            # max_confidence = groupped_per_img["class_name", "confidence"].max()
-            statistic_by_max_objects = groupped_per_img[groupped_per_img["class_name", "count"] == max_num_objects]
-
-            if len(statistic_by_max_objects) > 1:
-                # statistic_by_max_mean_conf = statistic_by_max_objects.reset_index().max().values
-                statistic_by_max_mean_conf = statistic_by_max_objects.loc[[statistic_by_max_objects["confidence", "mean"].idxmax()]]
-                final_res.extend(statistic_by_max_mean_conf.reset_index().values)
-            else:
-                final_res.extend(statistic_by_max_objects.reset_index().values)
-        # groupped.to_csv("table_agg.csv", index=True) # Раскомментируйте, если хотите увидеть результаты аггрегации
-
-        final_table = pd.DataFrame(final_res, columns=["image_name", "class_name", "count", "confidence"])
-        final_table.to_csv("table_final.csv", index=False)
+        df = pd.DataFrame(final_dict)
+        for key, val in regs.items():
+            for el in val:
+                for img_path, count_img in el.get_images().items():
+                    new_row = {'name_folder': 1, 'class': el.get_animal_species(),
+                            'date_registration_start': el.get_data_start().strftime('%Y-%m-%d %H:%M:%S'),
+                            'flag': el.get_duration(),
+                            'count': count_img,
+                            'max_count': el.get_max_count(),
+                            'link': img_path}
+                    df.loc[len(df)] = new_row
+        df = df.sort_values(by=['date_registration_start'])
+        df.to_csv('answer.csv', index=False)
+        return df
+    else:
+        return None
 
 
 if __name__ == '__main__':
-    main()
+    list_files = os.listdir('train_data_Minprirodi\\traps\\1\\images')
+    list_files = [os.path.join('train_data_Minprirodi\\traps\\1\\images', el) for el in list_files]
+    answer = process_images(list_files)
+    print(answer)
