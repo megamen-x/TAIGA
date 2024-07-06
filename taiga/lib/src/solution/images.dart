@@ -50,6 +50,11 @@ class ImagesState extends State<ImagesWidget> {
   ScrollController _singleChildScroll = new ScrollController();
   final ScrollController _small = ScrollController();
 
+  var dataMap = [];
+  var dataFinalList = [];
+  List<dynamic> timeList = [];
+  int maxValue = 2000;
+
   String current = Directory.current.path;
   late Uri fileprovider = Uri.parse('file:///${'$current/responce'}');
 
@@ -99,6 +104,27 @@ class ImagesState extends State<ImagesWidget> {
     }
   }
 
+  List<int> convertToSeconds(List<dynamic> timeStrings) {
+    return timeStrings.map((timeString) {
+      List<String> parts = timeString.split(':');
+      int hours = int.parse(parts[0]);
+      int minutes = int.parse(parts[1]);
+      int seconds = int.parse(parts[2]);
+      int res = (hours * 3600 + minutes * 60 + seconds);
+      return res;
+    }).toList();
+  }
+
+  List<String> convertList(List<dynamic> inputList) {
+    return inputList.map((subList) {
+      if (subList.isNotEmpty) {
+        String timePart = subList[0].split(' - ')[1].split(' ')[2];
+        return timePart;
+      }
+      return '00:00:00'; 
+    }).toList();
+  }
+
   Future<void> uploadZip(context, pathFiles) async {
 
     setState(() {
@@ -129,8 +155,17 @@ class ImagesState extends State<ImagesWidget> {
           File dataFile = File(path);
           String dataString = dataFile.readAsStringSync();
           final responceMap = jsonDecode(dataString);
-          final dataMap = jsonDecode(jsonEncode(responceMap["data"]));
+          dataMap = jsonDecode(jsonEncode(responceMap["data"]));
+          // final data list
           print(dataMap);
+          var tmpList = [];
+          dataFinalList = dataMap.map((map) {return map.values.toList();}).toList();
+          for (var i = 0; i < dataFinalList.length; i++) {
+            tmpList.add(dataFinalList = dataMap.map((map) {return map.values.toList();}).toList()[i][2]);
+          }
+          timeList = convertList(tmpList);
+          List<int> convertedList = convertToSeconds(timeList);
+          maxValue = convertedList.reduce((curr, next) => curr > next? curr: next);
           setState(() {
             dataClearFlag = true;
             dataEmptyFlag = false;
@@ -150,21 +185,27 @@ class ImagesState extends State<ImagesWidget> {
           });
 
         }
+        else if (response.statusCode == 500) {
+          setState(() {
+            Sample.AlshowDialog(context, 'Ошибка обработки файла!', 'Проверьте файл и попробуйте снова');
+            clearData();
+          });
+        }
 
       } on SocketException {
         setState(() {
           Sample.AlshowDialog(context, 'Нет соединения с сервером!', 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
+          loadingFlag = false;
         });
       } on HttpException {
         setState(() {
           Sample.AlshowDialog(context, "Не удалось найти метод post!", 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
+          loadingFlag = false;
         });
       } on FormatException {
         setState(() {
           Sample.AlshowDialog(context, "Неправильный формат ответа!", 'Проверьте состояние сервера и попробуйте снова');
-          loadingFlag2 = false;
+          loadingFlag = false;
         });
       }
 
@@ -298,6 +339,7 @@ class ImagesState extends State<ImagesWidget> {
       dataEmptyFlag = false;
       zipplot = false;
       loadingFlag2 = false;
+      loadingFlag = false;
     });
   }
 
@@ -1049,10 +1091,13 @@ class ImagesState extends State<ImagesWidget> {
                                                   onSelectChanged: (bool? selected) {
                                                     if (selected != null && selected) {
                                                       setState(() {
-                                                        newfileargs.add(data.column1.join("\n\n"));
-                                                        newfileargs.add(data.column2.join("\n\n"));
-                                                        newfileargs.add(data.column3.join("\n\n"));
-                                                        newfileargs.add(data.column4.join("\n\n"));
+                                                        newfileargs.add(data.column1.join(", "));
+                                                        newfileargs.add(data.column2.join(", "));
+                                                        newfileargs.add(data.column3.join(", "));
+                                                        newfileargs.add(data.column4.join(", "));
+                                                        print(newfileargs);
+                                                        print('-- -- -- -- - -- -- -- - -');
+                                                        print(dataMap);
                                                       });
                                                       if (dataEmptyFlag == false) {
                                                         Navigator.push(
@@ -1118,13 +1163,8 @@ class ImagesState extends State<ImagesWidget> {
                                                   padding: EdgeInsets.fromLTRB(0*fframe, 20*fframe, 0*fframe, 0*fframe),
                                                   child: BarChart(
                                                     BarChartData(
-                                                      barGroups: [
-                                                        generateGroupData(1, 10),
-                                                        generateGroupData(2, 18),
-                                                        generateGroupData(3, 4),
-                                                        generateGroupData(4, 11),
-                                                      ],
-                                                      maxY: 25,
+                                                      barGroups: getData(timeList),
+                                                      maxY: (maxValue + 300).toDouble(),
                                                       barTouchData: BarTouchData(
                                                         enabled: true,
                                                         handleBuiltInTouches: false,
@@ -1153,12 +1193,6 @@ class ImagesState extends State<ImagesWidget> {
                                                               : SystemMouseCursors.click;
                                                         }
                                                       ),
-                                                      // borderData: FlBorderData(
-                                                      //   show: true,
-                                                      //   border: Border.all(
-                                                      //     color: Color(0xFFFFFFFF),
-                                                      //   )
-                                                      // ),
                                                       gridData: FlGridData(
                                                         show: true,
                                                         getDrawingHorizontalLine: (value) {
@@ -1186,7 +1220,7 @@ class ImagesState extends State<ImagesWidget> {
                                                         leftTitles: AxisTitles(
                                                           sideTitles: SideTitles(
                                                             showTitles: true,
-                                                            reservedSize: 32,
+                                                            reservedSize: 70,
                                                             getTitlesWidget: leftTitles,
                                                           ),
                                                         ),
@@ -1206,7 +1240,7 @@ class ImagesState extends State<ImagesWidget> {
                                                     ),
                                                   ),
                                                 ),
-                                                Text('Длительность регистраций',
+                                                Text('Длительность регистраций в секундах',
                                                   textAlign: TextAlign.center, 
                                                   style: TextStyle(
                                                     color: Color(0xFFFFFFFF),
@@ -1409,7 +1443,7 @@ class ImagesState extends State<ImagesWidget> {
   }
 
   List<PieChartSectionData> showingSections(List<double?> values) {
-    return List.generate(4, (i) {
+    return List.generate(values.length, (i) {
         final isTouched = i == touchedIndex;
         final fontSize = isTouched ? 25.0 : 16.0;
         final radius = isTouched ? 60.0 : 50.0;
@@ -1473,14 +1507,20 @@ class ImagesState extends State<ImagesWidget> {
 
   late int showingTooltip;
 
-  BarChartGroupData generateGroupData(int x, int y) {
-    return BarChartGroupData(
-      x: x,
-      showingTooltipIndicators: showingTooltip == x ? [0] : [],
-      barRods: [
-        BarChartRodData(toY: y.toDouble()),
-      ],
-    );
+  List<BarChartGroupData> getData(timeList){
+    List<int> convertedList = convertToSeconds(timeList);
+    // List<int> finList = [max(convertedList)]
+    List<BarChartGroupData> samedata = [];
+    for (int i = 0; i < convertedList.length; i++) {
+        samedata.add(BarChartGroupData(
+          x: i,
+          showingTooltipIndicators: showingTooltip == i ? [0] : [],
+          barRods: [
+            BarChartRodData(toY: convertedList[i].toDouble()),
+          ],
+        ),);
+    }
+    return samedata;
   }
 
   Widget bottomTitles(double value, TitleMeta meta,) {
@@ -1565,80 +1605,4 @@ class DataModel {
     };
   }
 
-  // static void updateDataModel(List<DataModel> dataList, List<String> newData) {
-  //   final String matchString = newData[0];
-  //   final String newColumn2 = newData[1];
-  //   final List<String> newColumn3 = [newData[2]];
-
-  //   for (DataModel dataModel in dataList) {
-  //     if (dataModel.column1 == matchString) {
-  //       dataModel.column2 = newColumn2;
-  //       dataModel.column3 = newColumn3;
-  //       break;
-  //     }
-  //   }
-  // }
 }
-
-
-
-
-// SizedBox(
-                                                //   width: 400*fframe,
-                                                //   child: Row(
-                                                //     mainAxisAlignment: MainAxisAlignment.start,
-                                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                                //     children: <Widget>[
-                                                //       // ElevatedButton.icon(
-                                                //       //   icon: loadingFlag
-                                                //       //       ? const Center(child: SizedBox(width: 35, height: 35, child: CircularProgressIndicator(color: Color(0xFF000000) )))
-                                                //       //       : const Icon(Icons.add_rounded, color: Color(0xFF000000), size: 35,),
-                                                //       //   label: Text(
-                                                //       //     loadingFlag ? 'АНАЛИЗ...' : ' ФОТО',
-                                                //       //     style: TextStyle(
-                                                //       //       fontFamily: 'Inter', 
-                                                //       //       fontSize: 23*fframe,
-                                                //       //       fontWeight: FontWeight.w700,
-                                                //       //       height: 1.3*fframe/frame,
-                                                //       //       color: Color(0xFF000000),
-                                                //       //     ),
-                                                //       //   ),
-                                                //       //   onPressed: () => loadingFlag ? null : uploadImage(context),
-                                                //       //   style: 
-                                                //       //   ElevatedButton.styleFrom(
-                                                //       //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-                                                //       //     side: const BorderSide(color: Color(0xFFF9F8F6), width: 0),
-                                                //       //     padding: const EdgeInsets.all(14),
-                                                //       //     backgroundColor: Color(0xFFF9F8F6),
-                                                //       //   ),
-                                                //       // ),
-                                                //       SizedBox(
-                                                //         width: 20*fframe,
-                                                //       ),
-                                                //       // ElevatedButton.icon(
-                                                //       //   icon: loadingFlag2
-                                                //       //       ? const Center(child: SizedBox(width: 35, height: 35, child: CircularProgressIndicator(color: Color(0xFF000000) )))
-                                                //       //       : const Icon(Icons.add_rounded, color: Color(0xFF000000), size: 35,),
-                                                //       //   label: Text(
-                                                //       //     loadingFlag2 ? 'АНАЛИЗ...' : 'АРХИВ',
-                                                //       //     style: TextStyle(
-                                                //       //       fontFamily: 'Inter', 
-                                                //       //       fontSize: 23*fframe,
-                                                //       //       fontWeight: FontWeight.w700,
-                                                //       //       height: 1.3*fframe/frame,
-                                                //       //       color: Color(0xFF000000),
-                                                //       //     ),
-                                                //       //   ),
-                                                //       //   onPressed: () => loadingFlag ? null : uploadZip(context),
-                                                //       //   // onPressed: () { loadingFlag = false; },
-                                                //       //   style: 
-                                                //       //   ElevatedButton.styleFrom(
-                                                //       //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-                                                //       //     side: const BorderSide(color: Color(0xFFF9F8F6), width: 0),
-                                                //       //     padding: const EdgeInsets.all(14),
-                                                //       //     backgroundColor: Color(0xFFF9F8F6),
-                                                //       //   ),
-                                                //       // ),
-                                                //     ],
-                                                //   ),
-                                                // ),
