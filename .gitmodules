@@ -1,0 +1,3 @@
+[submodule "taiga-server/taiga/ml"]
+	path = taiga-server/taiga/ml
+	url = https://github.com/Vlad188-1/Hack_2024.git

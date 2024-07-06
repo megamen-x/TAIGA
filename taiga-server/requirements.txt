@@ -1,0 +1,20 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+Pillow
+opencv-python
+djoser
+ensemble_boxes
+ultralytics
+pandas
+plotly
+scikit-learn
+transformers
+torchvision
+torchaudio
+--extra-index-url https://download.pytorch.org/whl/cu118
+tqdm
+confz
+numpy
+pandas
+timm==0.9.16
