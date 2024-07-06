@@ -1152,6 +1152,8 @@ class ImagesState extends State<ImagesWidget> {
                                         ),
                                         padding: EdgeInsets.all(20*fframe),
                                         child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             // ЗАМЕНИТЬ
                                             if (zipplot)
@@ -1240,185 +1242,188 @@ class ImagesState extends State<ImagesWidget> {
                                                     ),
                                                   ),
                                                 ),
-                                                Text('Длительность регистраций в секундах',
-                                                  textAlign: TextAlign.center, 
-                                                  style: TextStyle(
-                                                    color: Color(0xFFFFFFFF),
-                                                    fontFamily: 'Inter',
-                                                    fontSize: 14*fframe,
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 1*fframe/frame,
-                                                    height: 1.3*fframe/frame,
-                                                  )
+                                                Padding(
+                                                  padding: EdgeInsets.fromLTRB(60*fframe, 0*fframe, 0*fframe, 0*fframe),
+                                                  child: Text('Длительность регистраций в секундах',
+                                                    textAlign: TextAlign.center, 
+                                                    style: TextStyle(
+                                                      color: Color(0xFFFFFFFF),
+                                                      fontFamily: 'Inter',
+                                                      fontSize: 15*fframe,
+                                                      fontWeight: FontWeight.w300,
+                                                      letterSpacing: 1*fframe/frame,
+                                                      height: 1.3*fframe/frame,
+                                                    )
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                             SizedBox(
                                               width: 120*fframe,
                                             ),
-                                            if (zipplot)
-                                            Row(
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      width: 300*fframe,
-                                                      height: 250*fframe,
-                                                      child: PieChart(
-                                                        PieChartData (
-                                                          pieTouchData: PieTouchData(
-                                                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                                              setState(() {
-                                                                if (!event.isInterestedForInteractions ||
-                                                                    pieTouchResponse == null ||
-                                                                    pieTouchResponse.touchedSection == null) {
-                                                                  touchedIndex = -1;
-                                                                  return;
-                                                                }
-                                                                touchedIndex = pieTouchResponse
-                                                                    .touchedSection!.touchedSectionIndex;
-                                                              });
-                                                            },
-                                                          ),
-                                                          borderData: FlBorderData(
-                                                            show: false,
-                                                          ),
-                                                          sectionsSpace: 3,
-                                                          centerSpaceRadius: 40,
-                                                          sections: showingSections([20, 50, 15, 15]),
-                                                        )
-                                                      ),
-                                                    ),
-                                                    Text('Распределение классов',
-                                                      textAlign: TextAlign.center, 
-                                                      style: TextStyle(
-                                                        color: Color(0xFFFFFFFF),
-                                                        fontFamily: 'Inter',
-                                                        fontSize: 14*fframe,
-                                                        fontWeight: FontWeight.w500,
-                                                        letterSpacing: 1*fframe/frame,
-                                                        height: 1.3*fframe/frame,
-                                                      )
-                                                    ),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  mainAxisAlignment: MainAxisAlignment.end,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Row(children: [
-                                                      Container(
-                                                        width: 10*fframe,
-                                                        height: 10*fframe,
-                                                        decoration: BoxDecoration(
-                                                          color: Color(0xFF5FC1E0),
-                                                          borderRadius: BorderRadius.circular(15.0*fframe),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10*fframe,
-                                                      ),
-                                                      Text('1 класс',
-                                                        textAlign: TextAlign.center, 
-                                                        style: TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                          fontFamily: 'Inter',
-                                                          fontSize: 14*fframe,
-                                                          fontWeight: FontWeight.w500,
-                                                          letterSpacing: 1*fframe/frame,
-                                                          height: 1.3*fframe/frame,
-                                                        )
-                                                      ),
-                                                    ],),
-                                                    SizedBox(
-                                                      height: 4,
-                                                    ),
-                                                    Row(children: [
-                                                      Container(
-                                                        width: 10*fframe,
-                                                        height: 10*fframe,
-                                                        decoration: BoxDecoration(
-                                                          color: Color(0xFF1F77B4),
-                                                          borderRadius: BorderRadius.circular(15.0*fframe),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10*fframe,
-                                                      ),
-                                                      Text('2 класс',
-                                                        textAlign: TextAlign.center, 
-                                                        style: TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                          fontFamily: 'Inter',
-                                                          fontSize: 14*fframe,
-                                                          fontWeight: FontWeight.w500,
-                                                          letterSpacing: 1*fframe/frame,
-                                                          height: 1.3*fframe/frame,
-                                                        )
-                                                      ),
-                                                    ],),
-                                                    SizedBox(
-                                                      height: 4,
-                                                    ),
-                                                    Row(children: [
-                                                      Container(
-                                                        width: 10*fframe,
-                                                        height: 10*fframe,
-                                                        decoration: BoxDecoration(
-                                                          color: Color(0xFF437590),
-                                                          borderRadius: BorderRadius.circular(15.0*fframe),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10*fframe,
-                                                      ),
-                                                      Text('3 класс',
-                                                        textAlign: TextAlign.center, 
-                                                        style: TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                          fontFamily: 'Inter',
-                                                          fontSize: 14*fframe,
-                                                          fontWeight: FontWeight.w500,
-                                                          letterSpacing: 1*fframe/frame,
-                                                          height: 1.3*fframe/frame,
-                                                        )
-                                                      ),
-                                                    ],),
-                                                    SizedBox(
-                                                      height: 4,
-                                                    ),
-                                                    Row(children: [
-                                                      Container(
-                                                        width: 10*fframe,
-                                                        height: 10*fframe,
-                                                        decoration: BoxDecoration(
-                                                          color: Color(0xFFFFFFFF),
-                                                          borderRadius: BorderRadius.circular(15.0*fframe),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10*fframe,
-                                                      ),
-                                                      Text('4 класс',
-                                                        textAlign: TextAlign.center, 
-                                                        style: TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                          fontFamily: 'Inter',
-                                                          fontSize: 14*fframe,
-                                                          fontWeight: FontWeight.w500,
-                                                          letterSpacing: 1*fframe/frame,
-                                                          height: 1.3*fframe/frame,
-                                                        )
-                                                      ),
-                                                    ],),
-                                                    SizedBox(
-                                                      height: 4,
-                                                    ),
+                                            // if (zipplot)
+                                            // Row(
+                                            //   children: [
+                                            //     Column(
+                                            //       children: [
+                                            //         Container(
+                                            //           width: 300*fframe,
+                                            //           height: 250*fframe,
+                                            //           child: PieChart(
+                                            //             PieChartData (
+                                            //               pieTouchData: PieTouchData(
+                                            //                 touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                            //                   setState(() {
+                                            //                     if (!event.isInterestedForInteractions ||
+                                            //                         pieTouchResponse == null ||
+                                            //                         pieTouchResponse.touchedSection == null) {
+                                            //                       touchedIndex = -1;
+                                            //                       return;
+                                            //                     }
+                                            //                     touchedIndex = pieTouchResponse
+                                            //                         .touchedSection!.touchedSectionIndex;
+                                            //                   });
+                                            //                 },
+                                            //               ),
+                                            //               borderData: FlBorderData(
+                                            //                 show: false,
+                                            //               ),
+                                            //               sectionsSpace: 3,
+                                            //               centerSpaceRadius: 40,
+                                            //               sections: showingSections([20, 50, 15, 15]),
+                                            //             )
+                                            //           ),
+                                            //         ),
+                                            //         Text('Распределение классов',
+                                            //           textAlign: TextAlign.center, 
+                                            //           style: TextStyle(
+                                            //             color: Color(0xFFFFFFFF),
+                                            //             fontFamily: 'Inter',
+                                            //             fontSize: 14*fframe,
+                                            //             fontWeight: FontWeight.w500,
+                                            //             letterSpacing: 1*fframe/frame,
+                                            //             height: 1.3*fframe/frame,
+                                            //           )
+                                            //         ),
+                                            //       ],
+                                            //     ),
+                                            //     Column(
+                                            //       mainAxisAlignment: MainAxisAlignment.end,
+                                            //       crossAxisAlignment: CrossAxisAlignment.start,
+                                            //       children: <Widget>[
+                                            //         Row(children: [
+                                            //           Container(
+                                            //             width: 10*fframe,
+                                            //             height: 10*fframe,
+                                            //             decoration: BoxDecoration(
+                                            //               color: Color(0xFF5FC1E0),
+                                            //               borderRadius: BorderRadius.circular(15.0*fframe),
+                                            //             ),
+                                            //           ),
+                                            //           SizedBox(
+                                            //             width: 10*fframe,
+                                            //           ),
+                                            //           Text('1 класс',
+                                            //             textAlign: TextAlign.center, 
+                                            //             style: TextStyle(
+                                            //               color: Color(0xFFFFFFFF),
+                                            //               fontFamily: 'Inter',
+                                            //               fontSize: 14*fframe,
+                                            //               fontWeight: FontWeight.w500,
+                                            //               letterSpacing: 1*fframe/frame,
+                                            //               height: 1.3*fframe/frame,
+                                            //             )
+                                            //           ),
+                                            //         ],),
+                                            //         SizedBox(
+                                            //           height: 4,
+                                            //         ),
+                                            //         Row(children: [
+                                            //           Container(
+                                            //             width: 10*fframe,
+                                            //             height: 10*fframe,
+                                            //             decoration: BoxDecoration(
+                                            //               color: Color(0xFF1F77B4),
+                                            //               borderRadius: BorderRadius.circular(15.0*fframe),
+                                            //             ),
+                                            //           ),
+                                            //           SizedBox(
+                                            //             width: 10*fframe,
+                                            //           ),
+                                            //           Text('2 класс',
+                                            //             textAlign: TextAlign.center, 
+                                            //             style: TextStyle(
+                                            //               color: Color(0xFFFFFFFF),
+                                            //               fontFamily: 'Inter',
+                                            //               fontSize: 14*fframe,
+                                            //               fontWeight: FontWeight.w500,
+                                            //               letterSpacing: 1*fframe/frame,
+                                            //               height: 1.3*fframe/frame,
+                                            //             )
+                                            //           ),
+                                            //         ],),
+                                            //         SizedBox(
+                                            //           height: 4,
+                                            //         ),
+                                            //         Row(children: [
+                                            //           Container(
+                                            //             width: 10*fframe,
+                                            //             height: 10*fframe,
+                                            //             decoration: BoxDecoration(
+                                            //               color: Color(0xFF437590),
+                                            //               borderRadius: BorderRadius.circular(15.0*fframe),
+                                            //             ),
+                                            //           ),
+                                            //           SizedBox(
+                                            //             width: 10*fframe,
+                                            //           ),
+                                            //           Text('3 класс',
+                                            //             textAlign: TextAlign.center, 
+                                            //             style: TextStyle(
+                                            //               color: Color(0xFFFFFFFF),
+                                            //               fontFamily: 'Inter',
+                                            //               fontSize: 14*fframe,
+                                            //               fontWeight: FontWeight.w500,
+                                            //               letterSpacing: 1*fframe/frame,
+                                            //               height: 1.3*fframe/frame,
+                                            //             )
+                                            //           ),
+                                            //         ],),
+                                            //         SizedBox(
+                                            //           height: 4,
+                                            //         ),
+                                            //         Row(children: [
+                                            //           Container(
+                                            //             width: 10*fframe,
+                                            //             height: 10*fframe,
+                                            //             decoration: BoxDecoration(
+                                            //               color: Color(0xFFFFFFFF),
+                                            //               borderRadius: BorderRadius.circular(15.0*fframe),
+                                            //             ),
+                                            //           ),
+                                            //           SizedBox(
+                                            //             width: 10*fframe,
+                                            //           ),
+                                            //           Text('4 класс',
+                                            //             textAlign: TextAlign.center, 
+                                            //             style: TextStyle(
+                                            //               color: Color(0xFFFFFFFF),
+                                            //               fontFamily: 'Inter',
+                                            //               fontSize: 14*fframe,
+                                            //               fontWeight: FontWeight.w500,
+                                            //               letterSpacing: 1*fframe/frame,
+                                            //               height: 1.3*fframe/frame,
+                                            //             )
+                                            //           ),
+                                            //         ],),
+                                            //         SizedBox(
+                                            //           height: 4,
+                                            //         ),
 
-                                                  ],
-                                                ),
-                                              ],
-                                            )
+                                            //       ],
+                                            //     ),
+                                            //   ],
+                                            // )
                                           ],
                                         )
 

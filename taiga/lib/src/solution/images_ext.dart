@@ -66,85 +66,84 @@ class ExtImagesState extends State<ExtImagesWidget> {
     super.initState();
     item();
   }
+  // Масштабируемость реализации active learning
+  // void NewDataLabel(context,fileargs) {
+  //   showDialog(
+  //     context: context, 
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         backgroundColor: const Color(0xFF224138),
+  //         shadowColor: const Color.fromARGB(79, 34, 65, 56),
+  //         title: Text('Дополнительная разметка', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 24,fontWeight: FontWeight.w500, height: 1.3,),),
+  //         content: Container(
+  //           height: 100,
+  //           child: Column(
+  //             children: [
+  //               Text('Определите новый класс животных на фотографии', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w400, height: 1.3,),),
+  //               SizedBox(
+  //                 height: 23,
+  //               ),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Container(
+  //                     height: 50, 
+  //                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+  //                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
+  //                     child: MaterialButton(
+  //                       onPressed: () {setState(() {fileargs[2] = 'Выброс';}); Navigator.pop(context);}, 
+  //                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
+  //                       child: const Text('Выброс', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
+  //                       ),
+  //                   ),
+  //                   Container(
+  //                     height: 50, 
+  //                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+  //                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
+  //                     child: MaterialButton(
+  //                       onPressed: () {setState(() {fileargs[2] = 'Косуля - Capreolus';}); Navigator.pop(context);}, 
+  //                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
+  //                       child: const Text('Косуля', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
+  //                       ),
+  //                   ),
+  //                   Container(
+  //                     height: 50, 
+  //                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+  //                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
+  //                     child: MaterialButton(
+  //                       onPressed: () {setState(() {fileargs[2] = 'Олень - Cervus';}); Navigator.pop(context);}, 
+  //                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
+  //                       child: const Text('Олень', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
+  //                       ),
+  //                   ),
+  //                   Container(
+  //                     height: 50, 
+  //                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+  //                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
+  //                     child: MaterialButton(
+  //                       onPressed: () {setState(() {fileargs[2] = 'Кабарга - Moschus';}); Navigator.pop(context);}, 
+  //                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
+  //                       child: const Text('Кабарга', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
+  //                       ),
+  //                   ),
+  //                 ],
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         actions: [
+  //           IconButton(
+  //             icon: const Icon(Icons.close),
+  //             color: Colors.white,
+  //             tooltip: 'Выйти из меню разметки',
+  //             onPressed: () {Navigator.pop(context);},
+  //           ),
+  //         ],
+  //       );
+  //     }
+  //   );
+  // }
 
-  void NewDataLabel(context,fileargs) {
-    showDialog(
-      context: context, 
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF224138),
-          shadowColor: const Color.fromARGB(79, 34, 65, 56),
-          title: Text('Дополнительная разметка', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 24,fontWeight: FontWeight.w500, height: 1.3,),),
-          content: Container(
-            height: 100,
-            child: Column(
-              children: [
-                Text('Определите новый класс животных на фотографии', textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w400, height: 1.3,),),
-                SizedBox(
-                  height: 23,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: 50, 
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
-                      child: MaterialButton(
-                        onPressed: () {setState(() {fileargs[2] = 'Выброс';}); Navigator.pop(context);}, 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
-                        child: const Text('Выброс', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
-                        ),
-                    ),
-                    Container(
-                      height: 50, 
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
-                      child: MaterialButton(
-                        onPressed: () {setState(() {fileargs[2] = 'Косуля - Capreolus';}); Navigator.pop(context);}, 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
-                        child: const Text('Косуля', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
-                        ),
-                    ),
-                    Container(
-                      height: 50, 
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
-                      child: MaterialButton(
-                        onPressed: () {setState(() {fileargs[2] = 'Олень - Cervus';}); Navigator.pop(context);}, 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
-                        child: const Text('Олень', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
-                        ),
-                    ),
-                    Container(
-                      height: 50, 
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(7.0),border: Border.all(color: const Color(0xFFFFFFFF), width: 1)),
-                      child: MaterialButton(
-                        onPressed: () {setState(() {fileargs[2] = 'Кабарга - Moschus';}); Navigator.pop(context);}, 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0),),
-                        child: const Text('Кабарга', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFFFFFFF),fontFamily: 'Inter',fontSize: 20,fontWeight: FontWeight.w500, height: 1.3,),),
-                        ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              color: Colors.white,
-              tooltip: 'Выйти из меню разметки',
-              onPressed: () {Navigator.pop(context);},
-            ),
-          ],
-        );
-      }
-    );
-  }
-
-  
   @override
   Widget build(BuildContext context) {
     double baseWidth = 1600;
@@ -454,25 +453,25 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                                     color: Color(0xFF2A4350),
                                                     borderRadius: BorderRadius.circular(12.0*fframe),
                                                   ),
-                                                  // child: 
-                                                  // Padding(
-                                                  //   padding: const EdgeInsets.all(8.0),
-                                                  //   child: PageView.builder(
-                                                  //     controller: _imageController,
-                                                  //     scrollDirection: Axis.horizontal,
-                                                  //     // itemCount: 1,
-                                                  //     itemBuilder: (context, index) {
-                                                  //       return ClipRRect(
-                                                  //         child:
-                                                  //           Image.file(File(images[newindex]),
-                                                  //             height: 420*frame,
-                                                  //             width: MediaQuery.of(context).size.width * 1,
-                                                  //             fit: BoxFit.contain,
-                                                  //           ),
-                                                  //       );
-                                                  //     },
-                                                  //   ),
-                                                  // ),
+                                                  child: 
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: PageView.builder(
+                                                      controller: _imageController,
+                                                      scrollDirection: Axis.horizontal,
+                                                      itemCount: 2,
+                                                      itemBuilder: (context, index) {
+                                                        return ClipRRect(
+                                                          child:
+                                                            Image.file(File(images[index]),
+                                                              height: 420*frame,
+                                                              width: MediaQuery.of(context).size.width * 1,
+                                                              fit: BoxFit.contain,
+                                                            ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -482,7 +481,7 @@ class ExtImagesState extends State<ExtImagesWidget> {
                                           ),
                                           Container(
                                             width: 6*fframe,
-                                            height: 700*fframe,
+                                            height: 620*fframe,
                                             decoration: BoxDecoration(
                                               color: Color(0xFF1A95D7),
                                               borderRadius: BorderRadius.circular(15.0*fframe),

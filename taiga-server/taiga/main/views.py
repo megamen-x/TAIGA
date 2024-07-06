@@ -107,7 +107,7 @@ class ZipViewSet(generics.ListAPIView):
 
             list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
             answer = process_images(list_files, by_images=True)
-            answer.to_csv('media/csv/answer.csv')
+            answer.to_csv('media/csv/answer.csv', index = False)
 
             with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
                 cur_zipfile.write('media/csv/answer.csv', 'answer.csv')
@@ -168,7 +168,7 @@ class FilesViewSet(generics.ListAPIView):
         with open('media/jsons/data.txt', 'w') as outfile:
             json.dump(json_ans, outfile)
 
-        answer.to_csv('media/csv/answer.csv')
+        answer.to_csv('media/csv/answer.csv', index = False)
 
         with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
             cur_zipfile.write('media/jsons/data.txt', 'data.txt')
