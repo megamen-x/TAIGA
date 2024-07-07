@@ -86,11 +86,11 @@
   
     - Клонирование репозитория:
     ```
-    git clone https://github.com/megamen-x/ARTEMIS.git
+    git clone https://github.com/megamen-x/TAIGA.git
     ```
     - Создание и активация виртуального окружения (Протестировано на **Python 3.10.10**):
     ```
-    cd ./ARTEMIS
+    cd ./taiga
     python -m venv .venv
     .venv\Scripts\activate
     ```
@@ -101,12 +101,11 @@
     ```
     - Уставновка зависимостей (при использовании **CPU**):
     ```
-    pip3 install torch torchvision torchaudio
     pip3 install -r requirements.txt
     ```
     - После установки зависимостей (5-7 минут):
     ```
-    cd artemis-backend/artemis
+    cd taiga-server/taiga
     python manage.py makemigrations
     python manage.py migrate
     python manage.py runserver
@@ -125,7 +124,7 @@
   - Или введите в терминал команду ниже (для Windows):
   
   ```
-  cd ./ARTEMIS/artemis-app/Release/artemis.exe
+  cd ./taiga/taiga/Release/taiga.exe
   ```
 
 </details> 
@@ -135,7 +134,7 @@
   
   - Если у вас установлен Flutter (и его SDK):
     
-    - Запустить ```./artemis/lib/main.dart``` в режиме ```Run and Debug```
+    - Запустить ```./taiga/lib/main.dart``` в режиме ```Run and Debug```
 
   - Иначе:
 
@@ -156,7 +155,7 @@
     ```
     $ flutter doctor
     ```
-    - Запустить ```./artemis/lib/main.dart``` в режиме ```Run and Debug```
+    - Запустить ```./taiga/lib/main.dart``` в режиме ```Run and Debug```
 </details> 
 
 </br> 
