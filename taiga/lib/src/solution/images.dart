@@ -167,8 +167,17 @@ class ImagesState extends State<ImagesWidget> {
           // final data list
           var tmpList = [];
           dataFinalList = dataMap.map((map) {return map.values.toList();}).toList();
-          for (var i = 0; i < dataFinalList.length; i++) {
-            tmpList.add(dataFinalList = dataMap.map((map) {return map.values.toList();}).toList()[i][2]);
+          print(dataFinalList);
+          if (dataFinalList.length > 1) {
+            for (var i = 0; i < dataFinalList.length; i++) {
+              tmpList.add(dataFinalList = dataMap.map((map) {return map.values.toList();}).toList()[i][2]);
+            }
+            print(tmpList);
+          }
+          else {
+            print(dataFinalList);
+            tmpList.add(dataFinalList = dataMap.map((map) {return map.values.toList();}).toList()[0][2]);
+            print(tmpList);
           }
           timeList = convertList(tmpList);
           List<int> convertedList = convertToSeconds(timeList);
@@ -350,7 +359,9 @@ class ImagesState extends State<ImagesWidget> {
     }
     setState(() {
       _list.clear();
-      filesarr.clear();
+      if (!(filesarr?.isEmpty ?? true) ){
+        filesarr.clear();
+      }
       dataEmptyFlag = false;
       zipplot = false;
       loadingFlag2 = false;
@@ -1166,7 +1177,7 @@ class ImagesState extends State<ImagesWidget> {
                                                   child: BarChart(
                                                     BarChartData(
                                                       barGroups: getData(timeList),
-                                                      maxY: (maxValue + 300).toDouble(),
+                                                      maxY: ((maxValue + maxValue*0.15).round()).toDouble(),
                                                       barTouchData: BarTouchData(
                                                         enabled: true,
                                                         handleBuiltInTouches: false,
