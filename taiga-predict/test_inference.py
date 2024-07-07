@@ -231,8 +231,8 @@ def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                 :param values - вероятности, соответствующие каждый отдельной метке
 
                 Пример расчета:
-                another_words = ['Bear', 'Bear']
-                another_values = [0.8, 0.71]
+                another_words = ['Bear', 'Bear', 'Cat']
+                another_values = [0.8, 0.71, 0.62]
 
                 words, score, count = find_most_frequent_word_with_max_sum(another_words, another_values)
 
