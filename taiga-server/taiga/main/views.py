@@ -48,6 +48,8 @@ def create_dirs(path_to_directory):
     p = Path(path_to_directory)
     if 'archives' not in os.listdir(p):
         os.makedirs(p / 'archives')
+    if 'images' not in os.listdir(p):
+        os.makedirs(p / 'images')
     if 'jsons' not in os.listdir(p):
         os.makedirs(p / 'jsons')
     if 'zips' not in os.listdir(p):
@@ -151,29 +153,31 @@ class FilesViewSet(generics.ListAPIView):
 
         json_ans = {"data": []}
         for file in data:
-            FileSystemStorage(location='media/images/').save(file.name, file)
-
-            with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
-                cur_zipfile.write('media/images/' + file.name, 'images/' + os.path.basename(file.name))
+            if Path('media/images/' + file.name).suffix.lower() in ['.jpg', '.jpeg', '.png']:
+                FileSystemStorage(location='media/images/').save(file.name, file)
+                with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
+                    cur_zipfile.write('media/images/' + file.name, 'images/' + os.path.basename(file.name))
 
         list_files = [os.path.join('./media/images', el) for el in os.listdir('media/images/')]
 
-        answer = process_images(list_files, by_images=True)
-        res = {'name': [os.path.basename(el) for el in answer['link']],
-               'class': list(answer['class']),
-               'date_registration': [f'{i} - {j}' for i, j in enumerate(list(answer['flag']))],
-               'count': list(answer['count'])}
-        json_ans['data'].append(res)
+        if len(list_files) != 0:
+            answer = process_images(list_files, by_images=True)
+            res = {'name': [os.path.basename(el) for el in answer['link']],
+                'class': list(answer['class']),
+                'date_registration': [f'{i} - {j}' for i, j in enumerate(list(answer['flag']))],
+                'count': list(answer['count'])}
+            json_ans['data'].append(res)
+            answer.to_csv('media/csv/answer.csv', index = False)
+
+            with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
+                cur_zipfile.write('media/csv/answer.csv', 'answer.csv')
 
         with open('media/jsons/data.txt', 'w') as outfile:
             json.dump(json_ans, outfile)
-
-        answer.to_csv('media/csv/answer.csv', index = False)
-
+        
         with ZipFile('media/archives/file.zip', 'a') as cur_zipfile:
             cur_zipfile.write('media/jsons/data.txt', 'data.txt')
-            cur_zipfile.write('media/csv/answer.csv', 'answer.csv')
-
+        
         with open('media/archives/file.zip', 'rb') as cur_zipfile:
             response = HttpResponse(cur_zipfile, content_type='application/zip')
             response['Content-Disposition'] = f'attachment; filename=cur_zip_file.zip'
