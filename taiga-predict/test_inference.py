@@ -63,11 +63,6 @@ class Registration:
     3. species - класс животного конкретной регистрации
     """
 
-    """
-    Пожалуйста, не осуждайте за геттеры и сеттеры в классах ниже
-    У нас сокомандник больной на голову
-    """
-
     def __init__(
             self,
             data_start_registration: datetime,
@@ -125,6 +120,10 @@ class Registration:
 
 
 def sorted_files_by_time(files: list) -> tuple:
+    """
+    "Вытаскивает" информация о времени фиксации животного фотоловушкой с каждой фотографии и сортирует данные по времени
+    :param files: список всех фотографий для сортировки
+    """
     list_dates = []
     for file in files:
         img = Image.open(file)
@@ -154,6 +153,10 @@ def sorted_files_by_time(files: list) -> tuple:
 # Обработка изображений
 def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                    save_results_path: str = 'answer.csv', ) -> Union[pd.DataFrame, None]:
+    """
+    Измененный пайплайн организаторов для обработки данных. Включает в себя все - от классификации до
+    алгоритма матчинга кадров в последовательности
+    """
     keys = ['name_folder', 'class', 'date_registration_start', 'date_registration_end', 'count']
     if by_images:
         new_keys = ['count', 'link', 'date_registration', 'id']
@@ -211,6 +214,7 @@ def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                                 top_p = top_p.cpu().numpy().ravel()
                                 top_class_idx = top_class_idx.cpu().numpy().ravel()
 
+                                # отбирает кадры классификатора по вероятность верного ответа
                                 if top_p[0] > threshold:
                                     class_names = [mapping[top_class_idx[idx]] for idx, _ in enumerate(batch_images_cls)]
                                 else:
@@ -220,6 +224,23 @@ def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                                                                 count=len(class_names))
                             
             def find_most_frequent_word_with_max_sum(words, values):
+                """
+                Поикс класса, который наиболее часто встречается и имеет наибольшую суммарную вероятность среди всех объектов
+                Необходим для выставления метки всей последовательности по меткам каждый отдельной фотографии в регистрации
+                :param words - метки классов
+                :param values - вероятности, соответствующие каждый отдельной метке
+
+                Пример расчета:
+                another_words = ['Bear', 'Bear', 'Cat']
+                another_values = [0.8, 0.71, 0.62]
+
+                words, score, count = find_most_frequent_word_with_max_sum(another_words, another_values)
+
+                return:
+                1. words: Bear
+                2. score: 1.51
+                3. count: 2
+                """
                 word_counts = Counter(words)
                 max_count = max(word_counts.values())
                 most_frequent_words = [word for word, count in word_counts.items() if count == max_count]
@@ -237,14 +258,19 @@ def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                     return None, 0, 0
 
             try:
+                # удаляем из рассмотрения класс empty
                 all_classes = [el.get_species() for el in registration.get_images() if el.get_species().lower() != 'empty']
                 all_probs = [el.get_probability() for el in registration.get_images() if el.get_species().lower() != 'empty']
                 result_word, _, _ = find_most_frequent_word_with_max_sum(all_classes, all_probs)
             except:
                 result_word = 'Nan'
+            # и устанавливаем два параметра для регистрации
+            # класс животного на регистрации и максимальное количество животных в последовательности
             registration.set_species(class_animal=result_word)
             registration.set_max_count()
         most_common_dir_species = mode([registration.get_species() for registration in list_regs_by_time if registration.get_species() != 'Nan'])
+        # и крайне странным образом (у нас было всего 3 дня, простите)
+        # сохраняем данные о каждой регистрации в формате как в sample_submission.csv
         for registration in list_regs_by_time:
             if registration.get_species() == 'Nan':
                 registration.set_species(most_common_dir_species)
@@ -263,6 +289,8 @@ def process_images(listdir, threshold: float = 0.6, by_images: bool = False,
                     df.loc[len(df)] = new_row
             else:
                 df.loc[len(df)] = new_row
+
+    # сортируем табличку по времени регистрации и сохраняем данные регистраций
     df = df.sort_values(by=['name_folder', 'date_registration' if by_images else 'date_registration_start'])
     df.to_csv(save_results_path, index=False)
     return df

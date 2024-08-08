@@ -54,7 +54,6 @@
    - [YoloV8](https://docs.ultralytics.com/models/yolov8/)
    - [EfficientNet](https://github.com/lukemelas/EfficientNet-PyTorch)
    - [DINOV2](https://github.com/facebookresearch/dinov2)
-   - [CLIP](https://github.com/openai/CLIP)
 
 **Клиентская часть**
 

@@ -79,8 +79,13 @@ class ZipViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, *args, **kwargs):
-        # print(request.FILES['files'])
-        # return HttpResponse(status=204)
+
+        """
+        Обработка архива фотографий. Архив должен быть в zip-подобном формате.
+        Предназначен для получения главной информации о фотографиях - списков регистраций, классов животных и т.п.
+        
+        :param request - данные POST-запроса
+        """
 
         file = request.data.get('file')
         if file is None:
@@ -142,6 +147,12 @@ class FilesViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, *args, **kwargs):
+        """
+        Обработка списка файлов, переданных напрямую в drag-and-drop поле.
+        Предназначен для получения главной информации о фотографиях - списков регистраций, классов животных и т.п.
+        
+        :param request - данные POST-запроса
+        """
 
         data = request.data.getlist('file')
         if len(data) == 0:
