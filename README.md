@@ -18,7 +18,7 @@
 - [Проблематика задачи](#title1)
 - [Описание решения](#title2)
 - [Тестирование решения](#title3)
-- [Обновления](#title4)
+- [Награды](#title4)
 
 ## <h3 align="start"><a id="title1">Проблематика задачи</a></h3> 
 Необходимо создать, с применением технологий искусственного интеллекта, MVP в виде программного решения по регистрации животных на основе данных с фотоловушек.
@@ -172,9 +172,13 @@
 
 <p align="right">(<a href="#readme-top"><i>Вернуться наверх</i></a>)</p>
 
+## <h3 align="start"><a id="title4">Награды</a></h3> 
 
-## <h3 align="start"><a id="title4">Обновления</a></h3> 
-
-***Все обновления и нововведения будут размещаться здесь!***
+<div style="display: flex; justify-content: space-between;">
+  <img src="https://github.com/megamen-x/TAIGA/blob/main/taiga/assets/images/github/SKFO_Chufistov.png" alt="Image 1" style="width: 23%; height: auto; margin: 0 1%;">
+  <img src="https://github.com/megamen-x/TAIGA/blob/main/taiga/assets/images/github/SKFO_Lesha.png" alt="Image 2" style="width: 23%; height: auto; margin: 0 1%;">
+  <img src="https://github.com/megamen-x/TAIGA/blob/main/taiga/assets/images/github/SKFO_Sasha.png" alt="Image 3" style="width: 23%; height: auto; margin: 0 1%;">
+  <img src="https://github.com/megamen-x/TAIGA/blob/main/taiga/assets/images/github/SKFO_Vlad.png" alt="Image 4" style="width: 23%; height: auto; margin: 0 1%;">
+</div>
 
 <p align="right">(<a href="#readme-top"><i>Вернуться наверх</i></a>)</p>
